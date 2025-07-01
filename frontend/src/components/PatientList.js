@@ -14,7 +14,7 @@ export default function PatientList({ patients }) {
           className="px-4 py-3 hover:bg-indigo-50 transition-colors"
         >
           <Link
-            to={`/patient/${patient.patientid}`}
+            to={`/patients/${patient.patientid}`}
             className="text-indigo-600 hover:underline"
           >
             {patient.name} (Age: {patient.age})
