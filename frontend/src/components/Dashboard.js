@@ -168,8 +168,8 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="bg-#b1ea82 p-4 rounded-3xl shadow-lg overflow-hidden flex-grow"
-        style={{ marginTop: '1.5rem' }}
+        className=" p-4 rounded-3xl shadow-lg overflow-hidden flex-grow"
+        style={{backgroundColor: '#888072',  marginTop: '1.5rem' }}
       >
         <h4 className="text-lg font-semibold mb-4">Patients</h4>
         <PatientList patients={filteredPatients} />
