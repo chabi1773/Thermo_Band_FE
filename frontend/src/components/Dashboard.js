@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { apiGet } from '../apiClient';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import PatientList from './PatientList';
+import { supabase } from '../supabaseClient';
+
 
 export default function Dashboard() {
   const [temperatureData, setTemperatureData] = useState([]);
