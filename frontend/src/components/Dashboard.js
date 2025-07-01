@@ -16,7 +16,6 @@ export default function Dashboard() {
   }, []);
 
   async function fetchData() {
-  // Get Supabase token for authenticated request
   const {
     data: { session },
     error: sessionError,
@@ -30,7 +29,6 @@ export default function Dashboard() {
   const token = session.access_token;
 
   try {
-    // ✅ Fetch temperatures from your backend
     const tempRes = await fetch("https://thermoband-production.up.railway.app/temperatures", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -38,15 +36,12 @@ export default function Dashboard() {
     });
     const tempData = await tempRes.json();
 
-    // ✅ Fetch patients from your backend
     const patientRes = await fetch("https://thermoband-production.up.railway.app/patients", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     const patientData = await patientRes.json();
-
-    // ✅ Update state
     setTemperatureData(tempData);
     setPatients(patientData);
     setFilteredPatients(patientData);
