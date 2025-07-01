@@ -168,7 +168,7 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="bg-#888072 p-4 rounded-3xl shadow overflow-auto flex-grow"
+        className="bg-#b1ea82 p-4 rounded-3xl shadow overflow-auto flex-grow"
         style={{ marginTop: '1.5rem' }}
       >
         <h4 className="text-lg font-semibold mb-4">Patients</h4>
