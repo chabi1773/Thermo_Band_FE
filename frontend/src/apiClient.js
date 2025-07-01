@@ -1,7 +1,6 @@
 import { supabase } from './supabaseClient';
 
 export async function apiGet(endpoint) {
-  // Get the current session from Supabase
   const {
     data: { session },
     error,
@@ -18,8 +17,16 @@ export async function apiGet(endpoint) {
   });
 
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'API request failed');
+    // Try to extract a meaningful error message from the response
+    let errorMessage = 'API request failed';
+    try {
+      const err = await res.json();
+      errorMessage = err.error || errorMessage;
+    } catch {
+      const errText = await res.text(); // fallback to plain text if not JSON
+      errorMessage = errText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
 
   return res.json();
