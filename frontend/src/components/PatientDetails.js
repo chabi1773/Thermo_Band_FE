@@ -20,7 +20,7 @@ export default function PatientDetails() {
         setPatient(patientData);
 
         // Fetch temperature history
-        const tempData = await apiGet(`/temperatures?patientId=${id}`);
+        const tempData = await apiGet(`/temperatures/${id}`);
         setTemperatures(
           tempData.map((t) => ({
             Temperature: t.Temperature,
