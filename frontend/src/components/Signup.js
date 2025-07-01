@@ -13,25 +13,30 @@ export default function Signup() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card p-4 shadow-lg" style={{ minWidth: '350px' }}>
-        <h3 className="text-center mb-3">Sign Up</h3>
-        <form onSubmit={handleSignup}>
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+        <h3 className="text-center text-2xl font-semibold mb-6">Sign Up</h3>
+        <form onSubmit={handleSignup} className="space-y-4">
           <input
-            className="form-control mb-3"
             type="email"
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
-            className="form-control mb-3"
             type="password"
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          <button className="btn btn-primary w-100">Sign Up</button>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
+          >
+            Sign Up
+          </button>
         </form>
       </div>
     </div>
