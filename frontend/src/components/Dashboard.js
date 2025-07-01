@@ -130,7 +130,7 @@ export default function Dashboard() {
         <ResponsiveContainer width="100%" height={300}>
           <ScatterChart>
             <XAxis dataKey="DateTime" />
-            <YAxis domain={[35, 42]} unit="°C" />
+            <YAxis domain={[35, 42]} unit="" />
             <Tooltip
               formatter={(value, name, props) => {
                 const { payload } = props;
