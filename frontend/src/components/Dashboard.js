@@ -142,7 +142,7 @@ export default function Dashboard() {
               label={({ x, y, payload }) => {
                 if (!payload || !payload.patientName) return null;
                 return (
-                  <foreignObject x={x - 30} y={y - 20} width={120} height={24}>
+                  <foreignObject x={x - 30} y={y - 20} width={1200} height={24}>
                     <div
                       style={{
                         backgroundColor: '#4f46e5',
