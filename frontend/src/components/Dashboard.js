@@ -151,7 +151,7 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="bg-white p-4 rounded-3xl shadow mb-6"
+        className="bg-white p-4 rounded-3xl shadow mb-10"
         style={{ height: 300 }}
       >
         <ResponsiveContainer width="100%" height="100%">
@@ -169,6 +169,7 @@ export default function Dashboard() {
 
       <div
         className="bg-white p-4 rounded-3xl shadow overflow-auto flex-grow"
+        style={{ marginTop: '1.5rem' }}
       >
         <h4 className="text-lg font-semibold mb-4">Patients</h4>
         <PatientList patients={filteredPatients} />
