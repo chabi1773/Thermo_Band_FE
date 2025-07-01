@@ -90,19 +90,16 @@ export default function Dashboard() {
     setFilteredPatients(filtered);
   };
 
-  // Prepare data with patient names for the chart
-  const chartData = temperatureData.map((t) => {
-    const patient = patients.find((p) => p.patientid === t.patientid);
-    return {
-      ...t,
-      DateTime: new Date(t.datetime).toLocaleString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
-      patientName: patient ? patient.name : 'Unknown',
-    };
-  });
+  // Use patientName directly from temperatureData
+  const chartData = temperatureData.map((t) => ({
+    ...t,
+    DateTime: new Date(t.datetime).toLocaleString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }),
+    patientName: t.name || 'Unknown',
+  }));
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -142,25 +139,28 @@ export default function Dashboard() {
               dataKey="temperature"
               fill="#4f46e5"
               shape="circle"
-              label={({ x, y, payload }) => (
-                <foreignObject x={x - 30} y={y - 20} width={60} height={24}>
-                  <div
-                    style={{
-                      backgroundColor: '#4f46e5',
-                      color: 'white',
-                      borderRadius: '4px',
-                      fontSize: 12,
-                      textAlign: 'center',
-                      padding: '2px 4px',
-                      pointerEvents: 'none',
-                      userSelect: 'none',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {payload.patientName}
-                  </div>
-                </foreignObject>
-              )}
+              label={({ x, y, payload }) => {
+                if (!payload || !payload.patientName) return null;
+                return (
+                  <foreignObject x={x - 30} y={y - 20} width={60} height={24}>
+                    <div
+                      style={{
+                        backgroundColor: '#4f46e5',
+                        color: 'white',
+                        borderRadius: '4px',
+                        fontSize: 12,
+                        textAlign: 'center',
+                        padding: '2px 4px',
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {payload.patientName}
+                    </div>
+                  </foreignObject>
+                );
+              }}
             />
           </ScatterChart>
         </ResponsiveContainer>
