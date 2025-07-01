@@ -90,7 +90,6 @@ export default function Dashboard() {
     setFilteredPatients(filtered);
   };
 
-  // Use patientName directly from temperatureData
   const chartData = temperatureData.map((t) => ({
     ...t,
     DateTime: new Date(t.datetime).toLocaleString([], {
@@ -132,35 +131,18 @@ export default function Dashboard() {
           <ScatterChart>
             <XAxis dataKey="DateTime" />
             <YAxis domain={[35, 42]} unit="°C" />
-            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-
+            <Tooltip
+              formatter={(value, name, props) => {
+                const { payload } = props;
+                return [`${value}°C`, payload.patientName];
+              }}
+              cursor={{ strokeDasharray: '3 3' }}
+            />
             <Scatter
               data={chartData}
               dataKey="temperature"
               fill="#4f46e5"
               shape="circle"
-              label={({ x, y, payload }) => {
-                if (!payload || !payload.patientName) return null;
-                return (
-                  <foreignObject x={x - 30} y={y - 20} width={60} height={24}>
-                    <div
-                      style={{
-                        backgroundColor: '#4f46e5',
-                        color: 'white',
-                        borderRadius: '4px',
-                        fontSize: 12,
-                        textAlign: 'center',
-                        padding: '2px 4px',
-                        pointerEvents: 'none',
-                        userSelect: 'none',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {payload.patientName} - {payload.temperature}°C
-                    </div>
-                  </foreignObject>
-                );
-              }}
             />
           </ScatterChart>
         </ResponsiveContainer>
