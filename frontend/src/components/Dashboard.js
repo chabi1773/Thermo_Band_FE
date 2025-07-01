@@ -68,8 +68,8 @@ export default function Dashboard() {
     }[filter];
 
     const filtered = patients.filter((patient) => {
-      const patientTemps = temperatureData.filter(t => t.PatientID === patient.PatientID);
-      return patientTemps.some(t => t.Temperature >= range[0] && t.Temperature <= range[1]);
+      const patientTemps = temperatureData.filter(t => t.patientid === patient.patientid);
+      return patientTemps.some(t => t.temperature >= range[0] && t.temperature <= range[1]);
     });
 
     setFilteredPatients(filtered);
@@ -101,7 +101,7 @@ export default function Dashboard() {
           <LineChart
             data={temperatureData.map(t => ({
               ...t,
-              DateTime: new Date(t.DateTime).toLocaleString(),
+              DateTime: new Date(t.datetime).toLocaleString(),
             }))}
           >
             <XAxis dataKey="DateTime" />
