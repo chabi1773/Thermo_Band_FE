@@ -108,7 +108,7 @@ export default function Dashboard() {
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="Temperature" stroke="#4f46e5" dot={false} />
+            <Line type="monotone" dataKey="Temperature" stroke="#4f46e5" dot={true} />
           </LineChart>
         </ResponsiveContainer>
       </div>
