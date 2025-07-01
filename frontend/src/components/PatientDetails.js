@@ -23,14 +23,14 @@ export default function PatientDetails() {
         const tempData = await apiGet(`/temperatures/${id}`);
         setTemperatures(
           tempData.map((t) => ({
-            Temperature: t.Temperature,
-            DateTime: new Date(t.DateTime).toLocaleString(),
+            Temperature: t.temperature,
+            DateTime: new Date(t.datetime).toLocaleString(),
           }))
         );
 
         // Fetch linked device MAC
         const deviceData = await apiGet(`/devicepatient/${id}`);
-        setDeviceMac(deviceData.MacAddress || 'No device linked');
+        setDeviceMac(deviceData.macaddress || 'No device linked');
       } catch (err) {
         console.error(err.message);
         alert('Failed to load patient details');
@@ -57,7 +57,7 @@ export default function PatientDetails() {
       </button>
 
       <h2 className="text-2xl font-semibold mb-2">
-        {patient.Name} <span className="text-gray-500">(Age: {patient.Age})</span>
+        {patient.name} <span className="text-gray-500">(Age: {patient.age})</span>
       </h2>
 
       <p className="mb-4">
