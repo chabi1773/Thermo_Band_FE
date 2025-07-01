@@ -122,9 +122,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div 
-      className="max-w-6xl mx-auto px-4 py-6"
-      style={{ backgroundColor: '#f8f5ee' }}
+    <div
+      className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
+      style={{ backgroundColor: '#f8f5ee', height: '100vh' }}
     >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
@@ -141,7 +141,7 @@ export default function Dashboard() {
           id="filter"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full sm:w-64 p-2 border rounded-4xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full sm:w-64 p-2 border rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="all">All</option>
           <option value="low">Low (below 37.5°C)</option>
@@ -150,24 +150,29 @@ export default function Dashboard() {
         </select>
       </div>
 
-      <div className="bg-white p-4 rounded-3xl shadow mb-8">
-        <ResponsiveContainer width="100%" height={300}>
+      <div
+        className="bg-white p-4 rounded-3xl shadow mb-6"
+        style={{ height: 300 }}
+      >
+        <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
-            <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
+            <XAxis
+              dataKey="DateTime"
+              label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }}
+            />
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-            <Scatter
-              data={chartData}
-              dataKey="temperature"
-              fill="#4f46e5"
-              shape="circle"
-            />
+            <Scatter data={chartData} dataKey="temperature" fill="#4f46e5" shape="circle" />
           </ScatterChart>
         </ResponsiveContainer>
       </div>
 
-      <h4 className="text-lg font-semibold mb-2">Patients</h4>
-      <PatientList patients={filteredPatients} />
+      <div
+        className="bg-white p-4 rounded-3xl shadow overflow-auto flex-grow"
+      >
+        <h4 className="text-lg font-semibold mb-4">Patients</h4>
+        <PatientList patients={filteredPatients} />
+      </div>
     </div>
   );
 }
