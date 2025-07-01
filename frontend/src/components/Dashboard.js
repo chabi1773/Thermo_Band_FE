@@ -101,14 +101,14 @@ export default function Dashboard() {
           <LineChart
             data={temperatureData.map(t => ({
               ...t,
-              DateTime: new Date(t.datetime).toLocaleString(),
+              DateTime: new Date(t.datetime).toLocaleString([], {hour: '2-digit', minute:'2-digit', hour12: false}),
             }))}
           >
             <XAxis dataKey="DateTime" />
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="Temperature" stroke="#4f46e5" dot={true} />
+            <Line type="monotone" dataKey="temperature" stroke="#4f46e5" dot={true} />
           </LineChart>
         </ResponsiveContainer>
       </div>
