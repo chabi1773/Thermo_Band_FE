@@ -141,7 +141,7 @@ export default function Dashboard() {
           id="filter"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full sm:w-64 p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full sm:w-64 p-2 border rounded-4xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="all">All</option>
           <option value="low">Low (below 37.5°C)</option>
