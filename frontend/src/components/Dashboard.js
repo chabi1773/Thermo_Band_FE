@@ -134,7 +134,7 @@ export default function Dashboard() {
             <Tooltip
               formatter={(value, name, props) => {
                 const { payload } = props;
-                return [`${value}°C`, payload.patientName];
+                return [`${value}`, payload.patientName];
               }}
               cursor={{ strokeDasharray: '3 3' }}
             />
