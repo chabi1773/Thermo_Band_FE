@@ -156,7 +156,7 @@ export default function Dashboard() {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {payload.patientName}
+                      {payload.patientName} - {payload.temperature}°C
                     </div>
                   </foreignObject>
                 );
