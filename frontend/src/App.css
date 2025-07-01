@@ -28,8 +28,14 @@
   color: #61dafb;
 }
 
-body {
+html, body {
   background-color: #f8f5ee;
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  min-height: 100%;
 }
 
 @keyframes App-logo-spin {
