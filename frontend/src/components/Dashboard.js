@@ -100,10 +100,32 @@ export default function Dashboard() {
     patientName: t.name || 'Unknown',
   }));
 
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div
+          style={{
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            padding: '8px',
+            borderRadius: '8px',
+          }}
+        >
+          <p style={{ margin: 0, fontWeight: 'bold' }}>{data.patientName}</p>
+          <p style={{ margin: 0 }}>Temp: {data.temperature}°C</p>
+          <p style={{ margin: 0 }}>Time: {data.DateTime}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div 
-        className="max-w-6xl mx-auto px-4 py-6"
-        style={{ backgroundColor: '#f8f5ee' }} >
+      className="max-w-6xl mx-auto px-4 py-6"
+      style={{ backgroundColor: '#f8f5ee' }}
+    >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
       </h2>
@@ -128,26 +150,20 @@ export default function Dashboard() {
         </select>
       </div>
 
-      <div className="bg-white p-4 rounded-4xl shadow mb-8">
+      <div className="bg-white p-4 rounded-3xl shadow mb-8">
         <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart>
-              <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
-              <YAxis domain={[35, 42]} unit="°C" />
-              <Tooltip
-                formatter={(value, name, props) => {
-                  const { payload } = props;
-                  return [`${value}°C`, payload.patientName];
-                }}
-                cursor={{ strokeDasharray: '3 3' }}
-              />
-              <Scatter
-                data={chartData}
-                dataKey="temperature"
-                fill="#4f46e5"
-                shape="circle"
-              />
-            </ScatterChart>
-          </ResponsiveContainer>
+          <ScatterChart>
+            <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
+            <YAxis domain={[35, 42]} unit="°C" />
+            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
+            <Scatter
+              data={chartData}
+              dataKey="temperature"
+              fill="#4f46e5"
+              shape="circle"
+            />
+          </ScatterChart>
+        </ResponsiveContainer>
       </div>
 
       <h4 className="text-lg font-semibold mb-2">Patients</h4>
