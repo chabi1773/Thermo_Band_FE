@@ -1,9 +1,17 @@
-// src/apiClient.js
-export async function apiGet(endpoint) {
-  const token = localStorage.getItem('supabaseToken');
-  if (!token) throw new Error('No auth token found');
+import { supabase } from './supabaseClient';
 
-  const res = await fetch(`http://localhost:5000${endpoint}`, {
+export async function apiGet(endpoint) {
+  // Get the current session from Supabase
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error || !session) throw new Error('Not authenticated');
+
+  const token = session.access_token;
+
+  const res = await fetch(`https://thermoband-production.up.railway.app${endpoint}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },
@@ -13,5 +21,6 @@ export async function apiGet(endpoint) {
     const err = await res.json();
     throw new Error(err.error || 'API request failed');
   }
+
   return res.json();
 }
