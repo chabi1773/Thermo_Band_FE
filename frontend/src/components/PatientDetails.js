@@ -34,7 +34,7 @@ export default function PatientDetails() {
       } catch (err) {
         console.error(err.message);
         alert('Failed to load patient details');
-        navigate('/dashboard');
+        //navigate('/dashboard');
       } finally {
         setLoading(false);
       }
