@@ -124,7 +124,7 @@ export default function Dashboard() {
   return (
     <div
       className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
-      style={{ backgroundColor: '#f8f5ee', height: '100vh' }}
+      style={{ backgroundColor: '#888072', height: '100vh' }}
     >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
@@ -151,8 +151,8 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="bg-white p-4 rounded-3xl shadow mb-10 overflow-hidden"
-        style={{ height: 300 }}
+        className=" p-4 rounded-3xl shadow mb-10 overflow-hidden"
+        style={{backgroundColor: '#f8f5ee', height: 300 }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
@@ -169,7 +169,7 @@ export default function Dashboard() {
 
       <div
         className=" p-4 rounded-3xl shadow-lg overflow-hidden flex-grow"
-        style={{backgroundColor: '#888072',  marginTop: '1.5rem' }}
+        style={{backgroundColor: '#f8f5ee',  marginTop: '1.5rem' }}
       >
         <h4 className="text-lg font-semibold mb-4">Patients</h4>
         <PatientList patients={filteredPatients} />
