@@ -101,7 +101,9 @@ export default function Dashboard() {
   }));
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div 
+        className="max-w-6xl mx-auto px-4 py-6"
+        style={{ backgroundColor: '#f8f5ee' }} >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
       </h2>
