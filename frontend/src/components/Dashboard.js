@@ -14,16 +14,45 @@ export default function Dashboard() {
   }, []);
 
   async function fetchData() {
-    try {
-      const temps = await apiGet('/temperatures');
-      const pats = await apiGet('/patients');
-      setTemperatureData(temps);
-      setPatients(pats);
-      setFilteredPatients(pats);
-    } catch (err) {
-      console.error('Failed to fetch data:', err.message);
-    }
+  // Get Supabase token for authenticated request
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    console.error("No active session or token:", sessionError);
+    return;
   }
+
+  const token = session.access_token;
+
+  try {
+    // ✅ Fetch temperatures from your backend
+    const tempRes = await fetch("https://thermoband-production.up.railway.app/temperatures", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const tempData = await tempRes.json();
+
+    // ✅ Fetch patients from your backend
+    const patientRes = await fetch("https://thermoband-production.up.railway.app/patients", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const patientData = await patientRes.json();
+
+    // ✅ Update state
+    setTemperatureData(tempData);
+    setPatients(patientData);
+    setFilteredPatients(patientData);
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
+}
+
 
   useEffect(() => {
     filterPatients();
