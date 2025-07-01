@@ -151,7 +151,7 @@ export default function Dashboard() {
       </div>
 
       <div
-        className=" p-4 rounded-3xl shadow mb-10 overflow-hidden"
+        className="p-4 rounded-3xl shadow mb-10 overflow-hidden"
         style={{backgroundColor: '#f8f5ee', height: 300 }}
       >
         <ResponsiveContainer width="100%" height="100%">
@@ -168,7 +168,7 @@ export default function Dashboard() {
       </div>
 
       <div
-        className=" p-4 border-rounded-3xl shadow-lg overflow-hidden flex-grow"
+        className="p-4 border rounded-3xl shadow-lg overflow-hidden flex-grow"
         style={{backgroundColor: '#f8f5ee',  marginTop: '1.5rem' }}
       >
         <h4 className="text-lg font-semibold mb-4">Patients</h4>
