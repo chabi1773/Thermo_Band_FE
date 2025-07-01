@@ -130,24 +130,24 @@ export default function Dashboard() {
 
       <div className="bg-white p-4 rounded-xl shadow mb-8">
         <ResponsiveContainer width="100%" height={300}>
-          <ScatterChart>
-            <XAxis dataKey="DateTime" />
-            <YAxis domain={[35, 42]} unit="" />
-            <Tooltip
-              formatter={(value, name, props) => {
-                const { payload } = props;
-                return [`${value}`, payload.patientName];
-              }}
-              cursor={{ strokeDasharray: '3 3' }}
-            />
-            <Scatter
-              data={chartData}
-              dataKey="temperature"
-              fill="#4f46e5"
-              shape="circle"
-            />
-          </ScatterChart>
-        </ResponsiveContainer>
+            <ScatterChart>
+              <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
+              <YAxis domain={[35, 42]} unit="°C" />
+              <Tooltip
+                formatter={(value, name, props) => {
+                  const { payload } = props;
+                  return [`${value}°C`, payload.patientName];
+                }}
+                cursor={{ strokeDasharray: '3 3' }}
+              />
+              <Scatter
+                data={chartData}
+                dataKey="temperature"
+                fill="#4f46e5"
+                shape="circle"
+              />
+            </ScatterChart>
+          </ResponsiveContainer>
       </div>
 
       <h4 className="text-lg font-semibold mb-2">Patients</h4>
