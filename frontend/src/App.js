@@ -24,7 +24,7 @@ function App() {
             } 
           />
           <Route 
-            path="/patient/:id" 
+            path="/patients/:id" 
             element={
               <PrivateRoute>
                 <PatientDetails />
