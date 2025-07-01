@@ -128,7 +128,7 @@ export default function Dashboard() {
         </select>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow mb-8">
+      <div className="bg-white p-4 rounded-3xl shadow mb-8">
         <ResponsiveContainer width="100%" height={300}>
             <ScatterChart>
               <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
