@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { apiGet } from '../apiClient';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import PatientList from './PatientList';
 import { supabase } from '../supabaseClient';
-
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 export default function Dashboard() {
   const [temperatureData, setTemperatureData] = useState([]);
@@ -16,40 +21,46 @@ export default function Dashboard() {
   }, []);
 
   async function fetchData() {
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
 
-  if (sessionError || !session) {
-    console.error("No active session or token:", sessionError);
-    return;
+    if (sessionError || !session) {
+      console.error('No active session or token:', sessionError);
+      return;
+    }
+
+    const token = session.access_token;
+
+    try {
+      const tempRes = await fetch(
+        'https://thermoband-production.up.railway.app/temperatures',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const tempData = await tempRes.json();
+
+      const patientRes = await fetch(
+        'https://thermoband-production.up.railway.app/patients',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const patientData = await patientRes.json();
+
+      setTemperatureData(tempData);
+      setPatients(patientData);
+      setFilteredPatients(patientData);
+    } catch (err) {
+      console.error('Fetch error:', err);
+    }
   }
-
-  const token = session.access_token;
-
-  try {
-    const tempRes = await fetch("https://thermoband-production.up.railway.app/temperatures", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const tempData = await tempRes.json();
-
-    const patientRes = await fetch("https://thermoband-production.up.railway.app/patients", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const patientData = await patientRes.json();
-    setTemperatureData(tempData);
-    setPatients(patientData);
-    setFilteredPatients(patientData);
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-}
-
 
   useEffect(() => {
     filterPatients();
@@ -68,19 +79,42 @@ export default function Dashboard() {
     }[filter];
 
     const filtered = patients.filter((patient) => {
-      const patientTemps = temperatureData.filter(t => t.patientid === patient.patientid);
-      return patientTemps.some(t => t.temperature >= range[0] && t.temperature <= range[1]);
+      const patientTemps = temperatureData.filter(
+        (t) => t.patientid === patient.patientid
+      );
+      return patientTemps.some(
+        (t) => t.temperature >= range[0] && t.temperature <= range[1]
+      );
     });
 
     setFilteredPatients(filtered);
   };
 
+  // Prepare data with patient names for the chart
+  const chartData = temperatureData.map((t) => {
+    const patient = patients.find((p) => p.patientid === t.patientid);
+    return {
+      ...t,
+      DateTime: new Date(t.datetime).toLocaleString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+      patientName: patient ? patient.name : 'Unknown',
+    };
+  });
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
-      <h2 className="text-2xl font-semibold text-center mb-6">Patient Temperature Dashboard</h2>
+      <h2 className="text-2xl font-semibold text-center mb-6">
+        Patient Temperature Dashboard
+      </h2>
 
       <div className="mb-6">
-        <label htmlFor="filter" className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="filter"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           Filter by Temperature Range:
         </label>
         <select
@@ -98,18 +132,37 @@ export default function Dashboard() {
 
       <div className="bg-white p-4 rounded-xl shadow mb-8">
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={temperatureData.map(t => ({
-              ...t,
-              DateTime: new Date(t.datetime).toLocaleString([], {hour: '2-digit', minute:'2-digit', hour12: false}),
-            }))}
-          >
+          <ScatterChart>
             <XAxis dataKey="DateTime" />
             <YAxis domain={[35, 42]} unit="°C" />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="temperature" stroke="#4f46e5" dot={true} />
-          </LineChart>
+            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+
+            <Scatter
+              data={chartData}
+              dataKey="temperature"
+              fill="#4f46e5"
+              shape="circle"
+              label={({ x, y, payload }) => (
+                <foreignObject x={x - 30} y={y - 20} width={60} height={24}>
+                  <div
+                    style={{
+                      backgroundColor: '#4f46e5',
+                      color: 'white',
+                      borderRadius: '4px',
+                      fontSize: 12,
+                      textAlign: 'center',
+                      padding: '2px 4px',
+                      pointerEvents: 'none',
+                      userSelect: 'none',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {payload.patientName}
+                  </div>
+                </foreignObject>
+              )}
+            />
+          </ScatterChart>
         </ResponsiveContainer>
       </div>
 
