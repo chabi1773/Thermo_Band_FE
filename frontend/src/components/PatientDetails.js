@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import { apiGet } from '../apiClient';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function PatientDetails() {
@@ -12,84 +12,74 @@ export default function PatientDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchPatientDetails() {
+    async function fetchDetails() {
       setLoading(true);
+      try {
+        // Fetch patient info
+        const patientData = await apiGet(`/patients/${id}`);
+        setPatient(patientData);
 
-      // Fetch patient info
-      const { data: patientData, error: patientError } = await supabase
-        .from('Patient')
-        .select('*')
-        .eq('PatientID', id)
-        .single();
-
-      if (patientError || !patientData) {
-        alert('Patient not found or error occurred');
-        navigate('/dashboard');
-        return;
-      }
-      setPatient(patientData);
-
-      // Fetch temperature data for this patient
-      const { data: tempData, error: tempError } = await supabase
-        .from('DeviceTemp')
-        .select('Temperature, DateTime')
-        .eq('PatientID', id)
-        .order('DateTime', { ascending: true });
-
-      if (tempError) {
-        alert('Failed to load temperature data');
-        setTemperatures([]);
-      } else {
+        // Fetch temperature history
+        const tempData = await apiGet(`/temperatures?patientId=${id}`);
         setTemperatures(
           tempData.map((t) => ({
             Temperature: t.Temperature,
             DateTime: new Date(t.DateTime).toLocaleString(),
           }))
         );
-      }
 
-      // Fetch device MAC address linked to patient (via backend API)
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/devicepatient/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${await supabase.auth.getSession().then(s => s.data.session?.access_token)}`,
-            },
-          }
-        );
-        const data = await response.json();
-        setDeviceMac(data.MacAddress || 'No device linked');
-      } catch {
-        setDeviceMac('Unable to fetch device info');
+        // Fetch linked device MAC
+        const deviceData = await apiGet(`/devicepatient/${id}`);
+        setDeviceMac(deviceData.MacAddress || 'No device linked');
+      } catch (err) {
+        console.error(err.message);
+        alert('Failed to load patient details');
+        navigate('/dashboard');
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
 
-    fetchPatientDetails();
+    fetchDetails();
   }, [id, navigate]);
 
-  if (loading) return <p className="text-center mt-5">Loading patient details...</p>;
+  if (loading) {
+    return <p className="text-center text-gray-600 mt-6">Loading patient details...</p>;
+  }
 
   return (
-    <div className="container my-4">
-      <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>Back</button>
-      <h2>{patient.Name} (Age: {patient.Age})</h2>
-      <p><strong>Linked Device MAC Address:</strong> {deviceMac}</p>
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      <button
+        className="mb-4 text-sm text-blue-600 hover:underline"
+        onClick={() => navigate(-1)}
+      >
+        ← Back
+      </button>
 
-      <h4 className="mt-4">Temperature History</h4>
+      <h2 className="text-2xl font-semibold mb-2">
+        {patient.Name} <span className="text-gray-500">(Age: {patient.Age})</span>
+      </h2>
+
+      <p className="mb-4">
+        <strong className="text-gray-700">Linked Device MAC Address:</strong>{' '}
+        <span className="text-gray-800">{deviceMac}</span>
+      </p>
+
+      <h4 className="text-lg font-semibold mb-2">Temperature History</h4>
+
       {temperatures.length === 0 ? (
-        <p>No temperature data available.</p>
+        <p className="text-gray-500">No temperature data available.</p>
       ) : (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={temperatures}>
-            <XAxis dataKey="DateTime" />
-            <YAxis domain={[35, 42]} unit="°C" />
-            <Tooltip />
-            <Line type="monotone" dataKey="Temperature" stroke="#82ca9d" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="bg-white p-4 rounded-xl shadow mt-4">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={temperatures}>
+              <XAxis dataKey="DateTime" />
+              <YAxis domain={[35, 42]} unit="°C" />
+              <Tooltip />
+              <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   );
