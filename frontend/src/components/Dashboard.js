@@ -124,7 +124,7 @@ export default function Dashboard() {
   return (
     <div
       className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
-      style={{ backgroundColor: '#888072', height: '100vh' }}
+      style={{ backgroundColor: '#c2cbb3', height: '100vh' }}
     >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
