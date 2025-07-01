@@ -9,51 +9,60 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert(error.message);
-    else navigate('/dashboard'); // Redirect to dashboard after successful login
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert(error.message);
+    } else {
+      // Save access token for API auth
+      localStorage.setItem('supabaseToken', data.session.access_token);
+      navigate('/dashboard');
+    }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow-lg p-4" style={{ maxWidth: '400px', width: '100%', borderRadius: '12px' }}>
-        <h3 className="text-center mb-4 fw-bold">Log In</h3>
-        <form onSubmit={handleLogin}>
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4">
+      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+        <h3 className="text-center text-2xl font-bold mb-6">Log In</h3>
+        <form onSubmit={handleLogin} className="space-y-4">
           <input
-            className="form-control mb-3 py-2"
             type="email"
             placeholder="Email address"
-            onChange={(e) => setEmail(e.target.value)}
             value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             autoFocus
-            style={{ fontSize: '1rem' }}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
-            className="form-control mb-4 py-2"
             type="password"
             placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
             value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ fontSize: '1rem' }}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          <button type="submit" className="btn btn-primary w-100 py-2 fw-semibold fs-5">
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
+          >
             Log In
           </button>
         </form>
 
-        <div className="text-center mt-3">
-          <Link to="/forgot-password" className="text-decoration-none small">
+        <div className="text-center mt-4">
+          <Link to="/forgot-password" className="text-sm text-indigo-600 hover:underline">
             Forgot Password?
           </Link>
         </div>
 
-        <hr className="my-4" />
+        <hr className="my-6 border-gray-300" />
 
         <div className="text-center">
-          <p className="mb-2">Don't have an account?</p>
-          <Link to="/signup" className="btn btn-outline-primary w-100 py-2 fw-semibold fs-5">
+          <p className="mb-2 text-gray-700">Don't have an account?</p>
+          <Link
+            to="/signup"
+            className="inline-block border border-indigo-600 text-indigo-600 font-semibold py-2 px-4 rounded-md hover:bg-indigo-50 transition"
+          >
             Sign Up
           </Link>
         </div>
