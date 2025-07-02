@@ -137,34 +137,31 @@ export default function Dashboard() {
 
   return (
     <div
-      className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
-      style={{ backgroundColor: '#c2cbb3', height: '100vh' }}
+      className="container-fluid d-flex flex-column"
+      style={{ backgroundColor: '#c2cbb3', height: '100vh', padding: '1.5rem' }}
     >
-      <h2 className="text-2xl font-semibold text-center mb-6">
+      <h2 className="text-center mb-4 fw-semibold">
         Patient Temperature Dashboard
       </h2>
 
-      <div className="flex justify-end mb-4">
+      <div className="d-flex justify-content-end mb-4">
         <button
-           className="bg-indigo-600 text-white px-4 py-2 rounded-3xl shadow hover:bg-indigo-700 transition"
+          className="btn btn-primary rounded-pill shadow"
           onClick={() => navigate('/add-patient')}
         >
           Add Patient
         </button>
       </div>
 
-      <div className="mb-6">
-        <label
-          htmlFor="filter"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
+      <div className="mb-4" style={{ maxWidth: '16rem' }}>
+        <label htmlFor="filter" className="form-label fw-semibold">
           Filter by Temperature Range:
         </label>
         <select
           id="filter"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full sm:w-64 p-2 border rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="form-select rounded-pill"
         >
           <option value="all">All</option>
           <option value="low">Low (below 37.5°C)</option>
@@ -174,7 +171,7 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="p-4 rounded-3xl shadow mb-10 overflow-hidden"
+        className="p-3 rounded shadow mb-5 overflow-hidden"
         style={{ backgroundColor: '#f8f5ee', height: 300 }}
       >
         <ResponsiveContainer width="100%" height="100%">
@@ -196,10 +193,10 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="p-4 border rounded-3xl shadow-lg overflow-hidden flex-grow"
+        className="p-3 border rounded shadow flex-grow-1 overflow-auto"
         style={{ backgroundColor: '#f8f5ee', marginTop: '1.5rem' }}
       >
-        <h4 className="text-lg font-semibold mb-4">Patients</h4>
+        <h4 className="mb-4 fw-semibold">Patients</h4>
         <PatientList patients={filteredPatients} />
       </div>
     </div>
