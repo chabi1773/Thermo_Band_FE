@@ -13,13 +13,14 @@ export default function PatientDetails() {
   const [deviceMac, setDeviceMac] = useState('');
   const [devices, setDevices] = useState([]);
   const [selectedMac, setSelectedMac] = useState('');
+  const [interval, setInterval] = useState('');
   const [loading, setLoading] = useState(true);
   const [assignLoading, setAssignLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Helper function to get JWT token from supabase
+  // Get token
   async function getToken() {
     const {
       data: { session },
@@ -36,29 +37,37 @@ export default function PatientDetails() {
     async function fetchDetails() {
       setLoading(true);
       try {
-        // Fetch patient info
         const patientData = await apiGet(`/patients/${id}`);
         setPatient(patientData);
 
-        // Fetch temperature history
+        // Fetch all temperatures and filter last 6 hours
         const tempData = await apiGet(`/temperatures/${id}`);
-        setTemperatures(
-          tempData.map((t) => ({
+        const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+
+        const filteredTemps = tempData
+          .filter((t) => new Date(t.datetime) > sixHoursAgo)
+          .map((t) => ({
             Temperature: t.temperature,
-            DateTime: new Date(t.datetime).toLocaleString(),
-          }))
-        );
+            DateTime: new Date(t.datetime).toLocaleTimeString(),
+          }));
+
+        setTemperatures(filteredTemps);
 
         // Fetch linked device MAC
         const deviceData = await apiGet(`/devicepatient/${id}`);
         const currentMac = deviceData.macaddress || '';
         setDeviceMac(currentMac);
+        if (deviceData.interval) {
+          setInterval(deviceData.interval.toString());
+        }
 
-        // Fetch list of unassigned devices only if no device assigned
+        // If no device linked, fetch unassigned list
         if (!currentMac) {
           const unassignedDevices = await apiGet('/esp32/unassigned-devices');
           setDevices(unassignedDevices);
-          if (unassignedDevices.length > 0) setSelectedMac(unassignedDevices[0].macaddress);
+          if (unassignedDevices.length > 0) {
+            setSelectedMac(unassignedDevices[0].macaddress);
+          }
         }
       } catch (err) {
         console.error(err.message);
@@ -153,7 +162,7 @@ export default function PatientDetails() {
       alert('Device reset successfully! You can now assign a new device.');
       setDeviceMac('');
       setSelectedMac('');
-      // Reload unassigned devices
+      setInterval('');
       const deviceList = await apiGet('/esp32/unassigned-devices');
       setDevices(deviceList);
       if (deviceList.length > 0) setSelectedMac(deviceList[0].macaddress);
@@ -207,6 +216,39 @@ export default function PatientDetails() {
     }
   }
 
+  async function handleSetInterval() {
+    setError('');
+    const token = await getToken();
+    if (!token || !interval || !deviceMac) return;
+
+    try {
+      const res = await fetch(
+        'https://thermoband-production.up.railway.app/patients/set-interval',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            macAddress: deviceMac,
+            interval: parseInt(interval),
+          }),
+        }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to set interval');
+        return;
+      }
+
+      alert('Interval updated successfully!');
+    } catch (err) {
+      setError('Failed to set interval');
+    }
+  }
+
   if (loading) {
     return <p className="text-center text-gray-600 mt-6">Loading patient details...</p>;
   }
@@ -224,12 +266,18 @@ export default function PatientDetails() {
         {patient.name} <span className="text-gray-500">(Age: {patient.age})</span>
       </h2>
 
-      <p className="mb-4">
+      <p className="mb-2">
         <strong className="text-gray-700">Linked Device MAC Address:</strong>{' '}
         <span className="text-gray-800">{deviceMac || 'No device linked'}</span>
       </p>
 
-      {/* Assign Device Section */}
+      {deviceMac && (
+        <p className="mb-4">
+          <strong className="text-gray-700">Current Interval:</strong>{' '}
+          {interval ? `${interval / 60} min` : 'Not set'}
+        </p>
+      )}
+
       {!deviceMac ? (
         <form onSubmit={handleAssignDevice} className="mb-6">
           <label className="block mb-2 font-semibold">Assign Device:</label>
@@ -259,6 +307,27 @@ export default function PatientDetails() {
         </form>
       ) : (
         <div className="mb-6">
+          <label className="block mb-2 font-semibold">Set Device Interval:</label>
+          <select
+            value={interval}
+            onChange={(e) => setInterval(e.target.value)}
+            className="border p-2 rounded w-full max-w-xs"
+          >
+            <option value="">Select Interval</option>
+            <option value="300">5 minutes</option>
+            <option value="900">15 minutes</option>
+            <option value="1800">30 minutes</option>
+            <option value="3600">1 hour</option>
+            <option value="21600">6 hours</option>
+          </select>
+          <button
+            onClick={handleSetInterval}
+            disabled={!interval}
+            className="mt-3 bg-amber-600 text-white px-4 py-2 rounded shadow hover:bg-amber-700 mr-3"
+          >
+            Set Interval
+          </button>
+
           <button
             onClick={handleResetDevice}
             disabled={resetLoading}
@@ -274,11 +343,12 @@ export default function PatientDetails() {
           >
             {deleteLoading ? 'Deleting...' : 'Delete Patient'}
           </button>
+
           {error && <p className="text-red-600 mt-2">{error}</p>}
         </div>
       )}
 
-      <h4 className="text-lg font-semibold mb-2">Temperature History</h4>
+      <h4 className="text-lg font-semibold mb-2">Temperature History (Last 6 hours)</h4>
 
       {temperatures.length === 0 ? (
         <p className="text-gray-500">No temperature data available.</p>
