@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import PatientDetails from './components/PatientDetails';
+import AddPatient from './components/AddPatient'; // Import AddPatient
 
 function App() {
   return (
@@ -15,21 +16,29 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <PrivateRoute>
                 <Dashboard />
               </PrivateRoute>
-            } 
+            }
           />
-          <Route 
-            path="/patients/:id" 
+          <Route
+            path="/patients/:id"
             element={
               <PrivateRoute>
                 <PatientDetails />
               </PrivateRoute>
-            } 
+            }
+          />
+          <Route
+            path="/add-patient"    // New route here
+            element={
+              <PrivateRoute>
+                <AddPatient />
+              </PrivateRoute>
+            }
           />
           <Route path="*" element={<Login />} />
         </Routes>
