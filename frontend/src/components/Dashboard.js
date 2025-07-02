@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // added for navigation
+import { useNavigate } from 'react-router-dom';
 import PatientList from './PatientList';
 import { supabase } from '../supabaseClient';
 import {
@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 
 export default function Dashboard() {
-  const navigate = useNavigate();  // added
+  const navigate = useNavigate();
 
   const [temperatureData, setTemperatureData] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -93,7 +93,17 @@ export default function Dashboard() {
     setFilteredPatients(filtered);
   };
 
-  const chartData = temperatureData.map((t) => ({
+  // Get only the latest temp per patient
+  const latestTempsByPatient = {};
+
+  temperatureData.forEach((t) => {
+    const current = latestTempsByPatient[t.patientid];
+    if (!current || new Date(t.datetime) > new Date(current.datetime)) {
+      latestTempsByPatient[t.patientid] = t;
+    }
+  });
+
+  const chartData = Object.values(latestTempsByPatient).map((t) => ({
     ...t,
     DateTime: new Date(t.datetime).toLocaleString([], {
       hour: '2-digit',
@@ -129,7 +139,9 @@ export default function Dashboard() {
       className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
       style={{ backgroundColor: '#c2cbb3', height: '100vh' }}
     >
-      {/* Add Patient Button top-right */}
+       <h2 className="text-2xl font-semibold text-center mb-6">
+        Patient Temperature Dashboard
+      </h2>
       <div className="flex justify-end mb-4">
         <button
           className="bg-indigo-600 text-white px-4 py-2 rounded-3xl shadow hover:bg-indigo-700 transition"
@@ -139,9 +151,7 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <h2 className="text-2xl font-semibold text-center mb-6">
-        Patient Temperature Dashboard
-      </h2>
+     
 
       <div className="mb-6">
         <label
