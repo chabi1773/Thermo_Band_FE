@@ -116,6 +116,10 @@ export default function PatientDetails() {
   }
 
   async function handleResetDevice() {
+    const confirmed = window.confirm(
+    'Are you sure you want to reset the device? This will unassign it from the patient.'
+  );
+  if (!confirmed) return;
     setResetLoading(true);
     setError('');
 
@@ -134,7 +138,7 @@ export default function PatientDetails() {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ patientId: id }),
+          body: JSON.stringify({ macAddress: deviceMac, reset: true }),
         }
       );
       const data = await res.json();
