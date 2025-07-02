@@ -65,10 +65,16 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    filterPatients();
-  }, [filter, temperatureData]);
+  // Build a map of latest temperature record per patient
+  const latestTempsByPatient = {};
+  temperatureData.forEach((t) => {
+    const current = latestTempsByPatient[t.patientid];
+    if (!current || new Date(t.datetime) > new Date(current.datetime)) {
+      latestTempsByPatient[t.patientid] = t;
+    }
+  });
 
+  // Filter patients based on latest temperature only
   const filterPatients = () => {
     if (filter === 'all') {
       setFilteredPatients(patients);
@@ -82,26 +88,21 @@ export default function Dashboard() {
     }[filter];
 
     const filtered = patients.filter((patient) => {
-      const patientTemps = temperatureData.filter(
-        (t) => t.patientid === patient.patientid
-      );
-      return patientTemps.some(
-        (t) => t.temperature >= range[0] && t.temperature <= range[1]
+      const latestTemp = latestTempsByPatient[patient.patientid];
+      if (!latestTemp) return false; // no temp record, exclude
+
+      return (
+        latestTemp.temperature >= range[0] && latestTemp.temperature <= range[1]
       );
     });
 
     setFilteredPatients(filtered);
   };
 
-  // Get only the latest temp per patient
-  const latestTempsByPatient = {};
-
-  temperatureData.forEach((t) => {
-    const current = latestTempsByPatient[t.patientid];
-    if (!current || new Date(t.datetime) > new Date(current.datetime)) {
-      latestTempsByPatient[t.patientid] = t;
-    }
-  });
+  // Run filterPatients whenever filter or temperatureData changes
+  useEffect(() => {
+    filterPatients();
+  }, [filter, temperatureData]);
 
   const chartData = Object.values(latestTempsByPatient).map((t) => ({
     ...t,
@@ -139,19 +140,18 @@ export default function Dashboard() {
       className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
       style={{ backgroundColor: '#c2cbb3', height: '100vh' }}
     >
-       <h2 className="text-2xl font-semibold text-center mb-6">
+      <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
       </h2>
+
       <div className="flex justify-end mb-4">
         <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded-3xl shadow hover:bg-indigo-700 transition"
+          <button class="bg-sky-500 hover:bg-sky-700 ">
           onClick={() => navigate('/add-patient')}
         >
           Add Patient
         </button>
       </div>
-
-     
 
       <div className="mb-6">
         <label
@@ -185,7 +185,12 @@ export default function Dashboard() {
             />
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-            <Scatter data={chartData} dataKey="temperature" fill="#4f46e5" shape="circle" />
+            <Scatter
+              data={chartData}
+              dataKey="temperature"
+              fill="#4f46e5"
+              shape="circle"
+            />
           </ScatterChart>
         </ResponsiveContainer>
       </div>
