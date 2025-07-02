@@ -3,19 +3,19 @@ import { Link } from 'react-router-dom';
 
 export default function PatientList({ patients }) {
   if (!patients || patients.length === 0) {
-    return <p className="text-gray-500">No patients found for the selected filter.</p>;
+    return <p className="text-muted">No patients found for the selected filter.</p>;
   }
 
   return (
-    <ul className="divide-y divide-gray-200 border border-gray-300 rounded-md">
+    <ul className="list-group">
       {patients.map((patient) => (
         <li
           key={patient.patientid}
-          className="px-4 py-3 hover:bg-indigo-50 transition-colors"
+          className="list-group-item d-flex justify-content-between align-items-center"
         >
           <Link
             to={`/patients/${patient.patientid}`}
-            className="text-indigo-600 hover:underline"
+            className="text-primary text-decoration-none"
           >
             {patient.name} (Age: {patient.age})
           </Link>
