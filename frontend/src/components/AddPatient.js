@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -10,6 +10,7 @@ export default function AddPatient() {
   const [age, setAge] = useState('');
   const [patientId, setPatientId] = useState(null);
   const [macAddress, setMacAddress] = useState('');
+  const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -26,6 +27,37 @@ export default function AddPatient() {
     return session.access_token;
   }
 
+  useEffect(() => {
+    if (step === 2) {
+      // Fetch unassigned devices when on step 2
+      async function fetchDevices() {
+        const token = await getToken();
+        if (!token) return;
+
+        try {
+          const res = await fetch(
+            'https://thermoband-production.up.railway.app/esp32/unassigned-devices',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!res.ok) {
+            throw new Error('Failed to fetch devices');
+          }
+          const data = await res.json();
+          setDevices(data);
+          if (data.length > 0) setMacAddress(data[0].macaddress);
+        } catch (err) {
+          console.error(err);
+          setError('Failed to load devices');
+        }
+      }
+      fetchDevices();
+    }
+  }, [step]);
+
   async function handleAddPatient(e) {
     e.preventDefault();
     setError('');
@@ -41,8 +73,8 @@ export default function AddPatient() {
       return;
     }
 
-    // Decode userId from JWT token payload
     try {
+      // Decode userId from JWT token payload
       const payloadBase64 = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payloadBase64));
       const userId = decodedPayload.sub || decodedPayload.user_id || decodedPayload.id;
@@ -78,8 +110,8 @@ export default function AddPatient() {
   async function handleAssignDevice(e) {
     e.preventDefault();
     setError('');
-    if (!macAddress.trim()) {
-      setError('Please enter MAC address.');
+    if (!macAddress) {
+      setError('Please select a device MAC address.');
       return;
     }
     setLoading(true);
@@ -165,19 +197,27 @@ export default function AddPatient() {
           <form onSubmit={handleAssignDevice}>
             <label className="block mb-4">
               Device MAC Address:
-              <input
-                type="text"
-                value={macAddress}
-                onChange={(e) => setMacAddress(e.target.value)}
-                className="w-full border p-2 rounded mt-1"
-                placeholder="e.g. 12:34:56:78:90"
-              />
+              {devices.length === 0 ? (
+                <p className="text-gray-500 mt-1">No unassigned devices available</p>
+              ) : (
+                <select
+                  value={macAddress}
+                  onChange={(e) => setMacAddress(e.target.value)}
+                  className="w-full border p-2 rounded mt-1"
+                >
+                  {devices.map((device) => (
+                    <option key={device.macaddress} value={device.macaddress}>
+                      {device.macaddress}
+                    </option>
+                  ))}
+                </select>
+              )}
             </label>
             {error && <p className="text-red-600 mb-4">{error}</p>}
             <button
               type="submit"
-              disabled={loading}
-              className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
+              disabled={loading || devices.length === 0}
+              className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 disabled:opacity-50"
             >
               {loading ? 'Assigning...' : 'Assign Device'}
             </button>
