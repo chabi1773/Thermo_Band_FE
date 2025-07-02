@@ -13,14 +13,13 @@ export default function PatientDetails() {
   const [deviceMac, setDeviceMac] = useState('');
   const [devices, setDevices] = useState([]);
   const [selectedMac, setSelectedMac] = useState('');
-  const [interval, setInterval] = useState('300'); // default 5 minutes (300 seconds)
+  const [interval, setInterval] = useState('300');
   const [loading, setLoading] = useState(true);
   const [assignLoading, setAssignLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Get token
   async function getToken() {
     const {
       data: { session },
@@ -40,7 +39,6 @@ export default function PatientDetails() {
         const patientData = await apiGet(`/patients/${id}`);
         setPatient(patientData);
 
-        // Fetch all temperatures and filter last 6 hours
         const tempData = await apiGet(`/temperatures/${id}`);
         const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
@@ -53,18 +51,14 @@ export default function PatientDetails() {
 
         setTemperatures(filteredTemps);
 
-        // Fetch linked device MAC and interval
         const deviceData = await apiGet(`/devicepatient/${id}`);
         const currentMac = deviceData.macaddress || '';
         setDeviceMac(currentMac);
 
-        // Only override interval if deviceData.interval exists and is valid
         if (deviceData.interval) {
           setInterval(deviceData.interval.toString());
-        } 
-        // else keep default 300 (5min)
+        }
 
-        // If no device linked, fetch unassigned devices list
         if (!currentMac) {
           const unassignedDevices = await apiGet('/esp32/unassigned-devices');
           setDevices(unassignedDevices);
@@ -165,7 +159,7 @@ export default function PatientDetails() {
       alert('Device reset successfully! You can now assign a new device.');
       setDeviceMac('');
       setSelectedMac('');
-      setInterval('300'); // reset to default 5 minutes
+      setInterval('300');
       const deviceList = await apiGet('/esp32/unassigned-devices');
       setDevices(deviceList);
       if (deviceList.length > 0) setSelectedMac(deviceList[0].macaddress);
@@ -253,41 +247,41 @@ export default function PatientDetails() {
   }
 
   if (loading) {
-    return <p className="text-center text-gray-600 mt-6">Loading patient details...</p>;
+    return <p className="text-center text-muted mt-4">Loading patient details...</p>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="container px-4 py-5">
       <button
-        className="mb-4 text-sm text-blue-600 hover:underline"
+        className="btn btn-link mb-4 text-decoration-none"
         onClick={() => navigate(-1)}
       >
         ← Back
       </button>
 
-      <h2 className="text-2xl font-semibold mb-2">
-        {patient.name} <span className="text-gray-500">(Age: {patient.age})</span>
+      <h2 className="h4 mb-2">
+        {patient.name} <span className="text-muted">(Age: {patient.age})</span>
       </h2>
 
       <p className="mb-2">
-        <strong className="text-gray-700">Linked Device MAC Address:</strong>{' '}
-        <span className="text-gray-800">{deviceMac || 'No device linked'}</span>
+        <strong>Linked Device MAC Address:</strong>{' '}
+        <span>{deviceMac || 'No device linked'}</span>
       </p>
 
       {deviceMac && (
         <p className="mb-4">
-          <strong className="text-gray-700">Current Interval:</strong>{' '}
+          <strong>Current Interval:</strong>{' '}
           {interval ? `${interval / 60} min` : 'Not set'}
         </p>
       )}
 
       {!deviceMac ? (
-        <form onSubmit={handleAssignDevice} className="mb-6">
-          <label className="block mb-2 font-semibold">Assign Device:</label>
+        <form onSubmit={handleAssignDevice} className="mb-5">
+          <label className="form-label fw-semibold">Assign Device:</label>
           <select
             value={selectedMac}
             onChange={(e) => setSelectedMac(e.target.value)}
-            className="border p-2 rounded w-full max-w-xs"
+            className="form-select w-auto"
           >
             {devices.length === 0 ? (
               <option disabled>No unassigned devices available</option>
@@ -299,22 +293,22 @@ export default function PatientDetails() {
               ))
             )}
           </select>
-          {error && <p className="text-red-600 mt-2">{error}</p>}
+          {error && <p className="text-danger mt-2">{error}</p>}
           <button
             type="submit"
             disabled={assignLoading || devices.length === 0}
-            className="mt-3 bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
+            className="btn btn-primary mt-3"
           >
             {assignLoading ? 'Assigning...' : 'Assign Device'}
           </button>
         </form>
       ) : (
-        <div className="mb-6">
-          <label className="block mb-2 font-semibold">Set Device Interval:</label>
+        <div className="mb-5">
+          <label className="form-label fw-semibold">Set Device Interval:</label>
           <select
             value={interval}
             onChange={(e) => setInterval(e.target.value)}
-            className="border p-2 rounded w-full max-w-xs"
+            className="form-select w-auto"
           >
             <option value="">Select Interval</option>
             <option value="300">5 minutes</option>
@@ -326,7 +320,7 @@ export default function PatientDetails() {
           <button
             onClick={handleSetInterval}
             disabled={!interval}
-            className="mt-3 bg-amber-600 text-white px-4 py-2 rounded shadow hover:bg-amber-700 mr-3"
+            className="btn btn-warning mt-3 me-2"
           >
             Set Interval
           </button>
@@ -334,7 +328,7 @@ export default function PatientDetails() {
           <button
             onClick={handleResetDevice}
             disabled={resetLoading}
-            className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 mr-3"
+            className="btn btn-danger me-2"
           >
             {resetLoading ? 'Resetting...' : 'Reset Device'}
           </button>
@@ -342,21 +336,21 @@ export default function PatientDetails() {
           <button
             onClick={handleDeletePatient}
             disabled={deleteLoading}
-            className="bg-gray-700 text-white px-4 py-2 rounded shadow hover:bg-gray-900"
+            className="btn btn-dark"
           >
             {deleteLoading ? 'Deleting...' : 'Delete Patient'}
           </button>
 
-          {error && <p className="text-red-600 mt-2">{error}</p>}
+          {error && <p className="text-danger mt-2">{error}</p>}
         </div>
       )}
 
-      <h4 className="text-lg font-semibold mb-2">Temperature History (Last 6 hours)</h4>
+      <h4 className="h5 mb-3">Temperature History (Last 6 hours)</h4>
 
       {temperatures.length === 0 ? (
-        <p className="text-gray-500">No temperature data available.</p>
+        <p className="text-muted">No temperature data available.</p>
       ) : (
-        <div className="bg-white p-4 rounded-xl shadow mt-4">
+        <div className="card p-4 shadow">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={temperatures}>
               <XAxis dataKey="DateTime" />
