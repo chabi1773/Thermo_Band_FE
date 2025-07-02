@@ -18,13 +18,11 @@ export default function PatientDetails() {
   const [assignLoading, setAssignLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [setIntervalLoading, setSetIntervalLoading] = useState(false);
   const [error, setError] = useState('');
 
   async function getToken() {
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
+    const { data: { session }, error } = await supabase.auth.getSession();
     if (error || !session) {
       alert('You must be logged in');
       return null;
@@ -215,8 +213,12 @@ export default function PatientDetails() {
 
   async function handleSetInterval() {
     setError('');
+    setSetIntervalLoading(true);
     const token = await getToken();
-    if (!token || !interval || !deviceMac) return;
+    if (!token || !interval || !deviceMac) {
+      setSetIntervalLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(
@@ -237,12 +239,15 @@ export default function PatientDetails() {
 
       if (!res.ok) {
         setError(data.error || 'Failed to set interval');
+        setSetIntervalLoading(false);
         return;
       }
 
       alert('Interval updated successfully!');
     } catch (err) {
       setError('Failed to set interval');
+    } finally {
+      setSetIntervalLoading(false);
     }
   }
 
@@ -263,7 +268,6 @@ export default function PatientDetails() {
     );
   }
 
-  // helper for spinner inside buttons
   function renderButtonContent(isLoading, text) {
     return isLoading ? (
       <>
@@ -280,33 +284,34 @@ export default function PatientDetails() {
   }
 
   return (
-    <div className="container px-4 py-5 position-relative" style={{ minHeight: '650px' }}>
+    <div className="container px-4 py-3 position-relative" style={{ minHeight: '650px' }}>
+      {/* Back button top-left */}
       <button
-        className="btn btn-secondary mb-4"
+        className="btn btn-secondary position-absolute top-0 start-0 m-3"
         onClick={() => navigate(-1)}
-        disabled={loading}
       >
-        {renderButtonContent(loading, '← Back')}
+        ← Back
       </button>
 
-      <h2 className="h4 mb-2">
-        {patient.name} <span className="text-muted">(Age: {patient.age})</span>
-      </h2>
-
-      <p className="mb-2">
-        <strong>Linked Device MAC Address:</strong>{' '}
-        <span>{deviceMac || 'No device linked'}</span>
-      </p>
-
-      {deviceMac && (
-        <p className="mb-4">
-          <strong>Current Interval:</strong>{' '}
-          {interval ? `${interval / 60} min` : 'Not set'}
-        </p>
-      )}
+      {/* Centered patient details */}
+      <div className="d-flex flex-column align-items-center mb-4">
+        <h2 className="h4 mb-1 text-center">
+          {patient.name} <span className="text-muted">(Age: {patient.age})</span>
+        </h2>
+        <div className="d-flex gap-4 flex-wrap justify-content-center">
+          <span>
+            <strong>MAC Address:</strong> {deviceMac || 'No device linked'}
+          </span>
+          {deviceMac && (
+            <span>
+              <strong>Interval:</strong> {interval ? `${interval / 60} min` : 'Not set'}
+            </span>
+          )}
+        </div>
+      </div>
 
       {!deviceMac ? (
-        <form onSubmit={handleAssignDevice} className="mb-5">
+        <form onSubmit={handleAssignDevice} className="mb-4">
           <label className="form-label fw-semibold">Assign Device:</label>
           <select
             value={selectedMac}
@@ -334,29 +339,23 @@ export default function PatientDetails() {
         </form>
       ) : (
         <>
-          <h4 className="h5 mb-3">Temperature History (Last 6 hours)</h4>
-
+          <h4 className="h5 mb-2">Temperature History (Last 6 hours)</h4>
           {temperatures.length === 0 ? (
-            <p className="text-muted">No temperature data available.</p>
+            <p className="text-muted mb-3">No temperature data available.</p>
           ) : (
-            <div className="card p-4 shadow mb-4">
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="card p-3 shadow mb-3">
+              <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={temperatures}>
                   <XAxis dataKey="DateTime" />
                   <YAxis domain={[35, 42]} unit="°C" />
                   <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="Temperature"
-                    stroke="#16a34a"
-                    dot={false}
-                  />
+                  <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           )}
 
-          <div className="mb-5">
+          <div className="mb-4">
             <label className="form-label fw-semibold">Set Device Interval:</label>
             <select
               value={interval}
@@ -372,10 +371,10 @@ export default function PatientDetails() {
             </select>
             <button
               onClick={handleSetInterval}
-              disabled={!interval}
+              disabled={!interval || setIntervalLoading}
               className="btn btn-warning mt-3 me-2"
             >
-              {renderButtonContent(false, 'Set Interval')}
+              {renderButtonContent(setIntervalLoading, 'Set Interval')}
             </button>
           </div>
 
