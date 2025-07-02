@@ -5,7 +5,7 @@ import { supabase } from '../supabaseClient';
 export default function AddPatient() {
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(1); // Step 1: Add patient, Step 2: Assign device
+  const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [patientId, setPatientId] = useState(null);
@@ -14,7 +14,6 @@ export default function AddPatient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Helper to get token
   async function getToken() {
     const {
       data: { session },
@@ -29,7 +28,6 @@ export default function AddPatient() {
 
   useEffect(() => {
     if (step === 2) {
-      // Fetch unassigned devices when on step 2
       async function fetchDevices() {
         const token = await getToken();
         if (!token) return;
@@ -43,9 +41,7 @@ export default function AddPatient() {
               },
             }
           );
-          if (!res.ok) {
-            throw new Error('Failed to fetch devices');
-          }
+          if (!res.ok) throw new Error('Failed to fetch devices');
           const data = await res.json();
           setDevices(data);
           if (data.length > 0) setMacAddress(data[0].macaddress);
@@ -74,7 +70,6 @@ export default function AddPatient() {
     }
 
     try {
-      // Decode userId from JWT token payload
       const payloadBase64 = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payloadBase64));
       const userId = decodedPayload.sub || decodedPayload.user_id || decodedPayload.id;
@@ -152,35 +147,35 @@ export default function AddPatient() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
+    <div className="card mx-auto p-4 mt-5 shadow" style={{ maxWidth: '500px' }}>
       {step === 1 && (
         <>
-          <h2 className="text-xl font-semibold mb-4">Add New Patient</h2>
+          <h2 className="h5 mb-4">Add New Patient</h2>
           <form onSubmit={handleAddPatient}>
-            <label className="block mb-2">
-              Name:
+            <div className="mb-3">
+              <label className="form-label">Name:</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border p-2 rounded mt-1"
+                className="form-control"
               />
-            </label>
-            <label className="block mb-4">
-              Age:
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Age:</label>
               <input
                 type="number"
                 min="0"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                className="w-full border p-2 rounded mt-1"
+                className="form-control"
               />
-            </label>
-            {error && <p className="text-red-600 mb-4">{error}</p>}
+            </div>
+            {error && <p className="text-danger mb-3">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
+              className="btn btn-primary"
             >
               {loading ? 'Adding...' : 'Add Patient'}
             </button>
@@ -190,20 +185,20 @@ export default function AddPatient() {
 
       {step === 2 && (
         <>
-          <h2 className="text-xl font-semibold mb-4">Assign Device to Patient</h2>
-          <p className="mb-4">
-            Patient ID: <span className="font-mono">{patientId}</span>
+          <h2 className="h5 mb-4">Assign Device to Patient</h2>
+          <p className="mb-3">
+            Patient ID: <code>{patientId}</code>
           </p>
           <form onSubmit={handleAssignDevice}>
-            <label className="block mb-4">
-              Device MAC Address:
+            <div className="mb-3">
+              <label className="form-label">Device MAC Address:</label>
               {devices.length === 0 ? (
-                <p className="text-gray-500 mt-1">No unassigned devices available</p>
+                <p className="text-muted mt-1">No unassigned devices available</p>
               ) : (
                 <select
                   value={macAddress}
                   onChange={(e) => setMacAddress(e.target.value)}
-                  className="w-full border p-2 rounded mt-1"
+                  className="form-select"
                 >
                   {devices.map((device) => (
                     <option key={device.macaddress} value={device.macaddress}>
@@ -212,12 +207,12 @@ export default function AddPatient() {
                   ))}
                 </select>
               )}
-            </label>
-            {error && <p className="text-red-600 mb-4">{error}</p>}
+            </div>
+            {error && <p className="text-danger mb-3">{error}</p>}
             <button
               type="submit"
               disabled={loading || devices.length === 0}
-              className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 disabled:opacity-50"
+              className="btn btn-primary"
             >
               {loading ? 'Assigning...' : 'Assign Device'}
             </button>
