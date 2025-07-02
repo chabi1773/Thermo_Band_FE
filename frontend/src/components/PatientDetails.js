@@ -385,7 +385,7 @@ export default function PatientDetails() {
             className="btn btn-danger position-absolute top-0 end-0 m-3"
             style={{ zIndex: 10 }}
           >
-            {renderButtonContent(resetLoading, 'Resetting...')}
+            {renderButtonContent(resetLoading, 'Reset.')}
           </button>
 
           <button
@@ -393,7 +393,7 @@ export default function PatientDetails() {
             disabled={deleteLoading}
             className="btn btn-dark position-absolute bottom-0 end-0 m-3"
           >
-            {renderButtonContent(deleteLoading, 'Deleting...')}
+            {renderButtonContent(deleteLoading, 'Delete.')}
           </button>
 
           {error && <p className="text-danger mt-2">{error}</p>}
