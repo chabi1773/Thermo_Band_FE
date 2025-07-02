@@ -328,7 +328,7 @@ export default function PatientDetails() {
           <button
             onClick={handleResetDevice}
             disabled={resetLoading}
-            className="btn btn-danger me-2"
+            className="btn btn-danger me-2 position-absolute bottom-0 end-0 m-3"
           >
             {resetLoading ? 'Resetting...' : 'Reset Device'}
           </button>
