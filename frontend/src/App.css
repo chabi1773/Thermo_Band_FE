@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
 .App {
   text-align: center;
 }
@@ -49,4 +51,13 @@ html, body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.title{
+  font-family: "DM Sans";
+}
+
+.btns{
+  display: flex;
+  justify-content: space-between;
 }
