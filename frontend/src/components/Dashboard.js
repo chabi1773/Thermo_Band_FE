@@ -65,7 +65,6 @@ export default function Dashboard() {
     }
   }
 
-  // Build a map of latest temperature record per patient
   const latestTempsByPatient = {};
   temperatureData.forEach((t) => {
     const current = latestTempsByPatient[t.patientid];
@@ -74,7 +73,6 @@ export default function Dashboard() {
     }
   });
 
-  // Filter patients based on latest temperature only
   const filterPatients = () => {
     if (filter === 'all') {
       setFilteredPatients(patients);
@@ -89,7 +87,7 @@ export default function Dashboard() {
 
     const filtered = patients.filter((patient) => {
       const latestTemp = latestTempsByPatient[patient.patientid];
-      if (!latestTemp) return false; // no temp record, exclude
+      if (!latestTemp) return false;
 
       return (
         latestTemp.temperature >= range[0] && latestTemp.temperature <= range[1]
@@ -99,7 +97,6 @@ export default function Dashboard() {
     setFilteredPatients(filtered);
   };
 
-  // Run filterPatients whenever filter or temperatureData changes
   useEffect(() => {
     filterPatients();
   }, [filter, temperatureData]);
@@ -138,41 +135,44 @@ export default function Dashboard() {
   return (
     <div
       className="container-fluid d-flex flex-column"
-      style={{ backgroundColor: '#c2cbb3', height: '100vh', padding: '1.5rem' }}
+      style={{ backgroundColor: '#c2cbb3', minHeight: '100vh', padding: '1.5rem' }}
     >
-      <h2 className="text-center mb-4 fw-semibold">
-        Patient Temperature Dashboard
-      </h2>
+      {/* Header Row */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        {/* Filter on left */}
+        <div style={{ maxWidth: '16rem' }}>
+          <label htmlFor="filter" className="form-label fw-semibold">
+            Filter by Temperature:
+          </label>
+          <select
+            id="filter"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="form-select rounded-pill"
+          >
+            <option value="all">All</option>
+            <option value="low">Low (&lt; 37.5°C)</option>
+            <option value="moderate">Moderate (37.5–38.9°C)</option>
+            <option value="high">High (≥ 39°C)</option>
+          </select>
+        </div>
 
-      <div className="d-flex justify-content-end mb-4">
+        {/* Title in center */}
+        <h2 className="text-center flex-grow-1 m-0 fw-semibold">Dashboard</h2>
+
+        {/* Add Patient button on right */}
         <button
-          className="btn btn-primary rounded-pill shadow"
+          className="btn btn-primary rounded-pill shadow ms-auto"
           onClick={() => navigate('/add-patient')}
         >
           Add Patient
         </button>
       </div>
 
-      <div className="mb-4" style={{ maxWidth: '16rem' }}>
-        <label htmlFor="filter" className="form-label fw-semibold">
-          Filter by Temperature Range:
-        </label>
-        <select
-          id="filter"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="form-select rounded-pill"
-        >
-          <option value="all">All</option>
-          <option value="low">Low (below 37.5°C)</option>
-          <option value="moderate">Moderate (37.5°C - 38.9°C)</option>
-          <option value="high">High (39°C and above)</option>
-        </select>
-      </div>
-
+      {/* Chart */}
       <div
-        className="p-3 rounded shadow mb-5 overflow-hidden"
-        style={{ backgroundColor: '#f8f5ee', height: 300 }}
+        className="p-3 rounded shadow mb-3 overflow-hidden"
+        style={{ backgroundColor: '#f8f5ee', height: 280 }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
@@ -192,11 +192,12 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </div>
 
+      {/* Patient List */}
       <div
         className="p-3 border rounded shadow flex-grow-1 overflow-auto"
-        style={{ backgroundColor: '#f8f5ee', marginTop: '1.5rem' }}
+        style={{ backgroundColor: '#f8f5ee', marginTop: '1rem' }}
       >
-        <h4 className="mb-4 fw-semibold">Patients</h4>
+        <h4 className="mb-3 fw-semibold">Patients</h4>
         <PatientList patients={filteredPatients} />
       </div>
     </div>
