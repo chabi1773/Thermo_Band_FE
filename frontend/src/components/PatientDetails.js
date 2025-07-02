@@ -13,7 +13,7 @@ export default function PatientDetails() {
   const [deviceMac, setDeviceMac] = useState('');
   const [devices, setDevices] = useState([]);
   const [selectedMac, setSelectedMac] = useState('');
-  const [interval, setInterval] = useState('');
+  const [interval, setInterval] = useState('300'); // default 5 minutes (300 seconds)
   const [loading, setLoading] = useState(true);
   const [assignLoading, setAssignLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
@@ -53,15 +53,18 @@ export default function PatientDetails() {
 
         setTemperatures(filteredTemps);
 
-        // Fetch linked device MAC
+        // Fetch linked device MAC and interval
         const deviceData = await apiGet(`/devicepatient/${id}`);
         const currentMac = deviceData.macaddress || '';
         setDeviceMac(currentMac);
+
+        // Only override interval if deviceData.interval exists and is valid
         if (deviceData.interval) {
           setInterval(deviceData.interval.toString());
-        }
+        } 
+        // else keep default 300 (5min)
 
-        // If no device linked, fetch unassigned list
+        // If no device linked, fetch unassigned devices list
         if (!currentMac) {
           const unassignedDevices = await apiGet('/esp32/unassigned-devices');
           setDevices(unassignedDevices);
@@ -162,7 +165,7 @@ export default function PatientDetails() {
       alert('Device reset successfully! You can now assign a new device.');
       setDeviceMac('');
       setSelectedMac('');
-      setInterval('');
+      setInterval('300'); // reset to default 5 minutes
       const deviceList = await apiGet('/esp32/unassigned-devices');
       setDevices(deviceList);
       if (deviceList.length > 0) setSelectedMac(deviceList[0].macaddress);
