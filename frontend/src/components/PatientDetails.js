@@ -16,6 +16,7 @@ export default function PatientDetails() {
   const [loading, setLoading] = useState(true);
   const [assignLoading, setAssignLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Helper function to get JWT token from supabase
@@ -62,14 +63,13 @@ export default function PatientDetails() {
       } catch (err) {
         console.error(err.message);
         alert('Failed to load patient details');
-        // Optionally: navigate('/dashboard');
       } finally {
         setLoading(false);
       }
     }
 
     fetchDetails();
-  }, [id, navigate]);
+  }, [id]);
 
   async function handleAssignDevice(e) {
     e.preventDefault();
@@ -117,9 +117,10 @@ export default function PatientDetails() {
 
   async function handleResetDevice() {
     const confirmed = window.confirm(
-    'Are you sure you want to reset the device? This will unassign it from the patient.'
-  );
-  if (!confirmed) return;
+      'Are you sure you want to reset the device? This will unassign it from the patient.'
+    );
+    if (!confirmed) return;
+
     setResetLoading(true);
     setError('');
 
@@ -160,6 +161,49 @@ export default function PatientDetails() {
       setError('Failed to reset device');
     } finally {
       setResetLoading(false);
+    }
+  }
+
+  async function handleDeletePatient() {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this patient? This action cannot be undone and will erase all related data.'
+    );
+    if (!confirmed) return;
+
+    setDeleteLoading(true);
+    setError('');
+
+    const token = await getToken();
+    if (!token) {
+      setDeleteLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `https://thermoband-production.up.railway.app/patients/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to delete patient');
+        setDeleteLoading(false);
+        return;
+      }
+
+      alert('Patient deleted successfully!');
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Failed to delete patient');
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -218,9 +262,17 @@ export default function PatientDetails() {
           <button
             onClick={handleResetDevice}
             disabled={resetLoading}
-            className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700"
+            className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 mr-3"
           >
             {resetLoading ? 'Resetting...' : 'Reset Device'}
+          </button>
+
+          <button
+            onClick={handleDeletePatient}
+            disabled={deleteLoading}
+            className="bg-gray-700 text-white px-4 py-2 rounded shadow hover:bg-gray-900"
+          >
+            {deleteLoading ? 'Deleting...' : 'Delete Patient'}
           </button>
           {error && <p className="text-red-600 mt-2">{error}</p>}
         </div>
