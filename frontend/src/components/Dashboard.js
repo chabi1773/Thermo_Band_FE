@@ -138,41 +138,68 @@ export default function Dashboard() {
   return (
     <div
       className="container-fluid d-flex flex-column"
-      style={{ backgroundColor: '#c2cbb3', height: '100vh', padding: '1.5rem' }}
+      style={{ backgroundColor: '#ffffff', height: '100vh', padding: '1.5rem' }}
     >
-      <h2 className="text-center mb-4 fw-semibold">
+      <h2 className="text-center mb-4 title">
         Patient Temperature Dashboard
       </h2>
 
-      <div className="d-flex justify-content-end mb-4">
-        <button
-          className="btn btn-primary rounded-pill shadow"
-          onClick={() => navigate('/add-patient')}
-        >
-          Add Patient
-        </button>
-      </div>
-
-      <div className="mb-4" style={{ maxWidth: '16rem' }}>
-        <label htmlFor="filter" className="form-label fw-semibold">
-          Filter by Temperature Range:
-        </label>
-        <select
-          id="filter"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="form-select rounded-pill"
-        >
-          <option value="all">All</option>
-          <option value="low">Low (below 37.5°C)</option>
-          <option value="moderate">Moderate (37.5°C - 38.9°C)</option>
-          <option value="high">High (39°C and above)</option>
-        </select>
+      <div style = {{
+        display :'flex',
+        justifyContent : 'space-between',
+        alignItems: 'center',
+      }}>
+        <div className="mb-4" style={{ 
+          width: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          gap : '10px',
+         }}>
+          <label htmlFor="filter" className="form-label fw-semibold">
+            Filter by Temperature Range:
+          </label>
+          <select
+            id="filter"
+            style = {{
+              width: '40%',
+              borderRadius : '4px',
+              padding: '10px 16px',
+            }}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="form-select"
+          >
+            <option value="all">All</option>
+            <option value="low">Low (below 37.5°C)</option>
+            <option value="moderate">Moderate (37.5°C - 38.9°C)</option>
+            <option value="high">High (39°C and above)</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <button
+            className="btn btn-primary "
+            onClick={() => navigate('/add-patient')}
+            style = {{
+              borderRadius: '4px',
+              padding: '10px 16px',
+            }}
+          >
+            Add Patient
+          </button>
+        </div>
       </div>
 
       <div
-        className="p-3 rounded shadow mb-5 overflow-hidden"
-        style={{ backgroundColor: '#f8f5ee', height: 300 }}
+        className="p-3 rounded mb-5 overflow-hidden"
+        style={{ backgroundColor: '#ffffff',
+          padding: '4dvh 6dvw',
+          minHeight: '280px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          border: '1px rgba(115, 115, 115, 0.5) solid',
+
+         }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
@@ -185,7 +212,7 @@ export default function Dashboard() {
             <Scatter
               data={chartData}
               dataKey="temperature"
-              fill="#4f46e5"
+              fill="#f2f2f2"
               shape="circle"
             />
           </ScatterChart>
@@ -193,8 +220,10 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="p-3 border rounded shadow flex-grow-1 overflow-auto"
-        style={{ backgroundColor: '#f8f5ee', marginTop: '1.5rem' }}
+        className="p-3 rounded flex-grow-1 overflow-auto"
+        style={{ backgroundColor: '#ffffff', marginTop: '-1.5rem',
+          border: '1px rgba(115, 115, 115, 0.5) solid',
+         }}
       >
         <h4 className="mb-4 fw-semibold">Patients</h4>
         <PatientList patients={filteredPatients} />
