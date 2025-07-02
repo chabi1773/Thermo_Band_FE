@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // added for navigation
 import PatientList from './PatientList';
 import { supabase } from '../supabaseClient';
 import {
@@ -11,6 +12,8 @@ import {
 } from 'recharts';
 
 export default function Dashboard() {
+  const navigate = useNavigate();  // added
+
   const [temperatureData, setTemperatureData] = useState([]);
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -126,6 +129,16 @@ export default function Dashboard() {
       className="max-w-6xl mx-auto px-4 py-6 flex flex-col"
       style={{ backgroundColor: '#c2cbb3', height: '100vh' }}
     >
+      {/* Add Patient Button top-right */}
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded-3xl shadow hover:bg-indigo-700 transition"
+          onClick={() => navigate('/add-patient')}
+        >
+          Add Patient
+        </button>
+      </div>
+
       <h2 className="text-2xl font-semibold text-center mb-6">
         Patient Temperature Dashboard
       </h2>
@@ -152,7 +165,7 @@ export default function Dashboard() {
 
       <div
         className="p-4 rounded-3xl shadow mb-10 overflow-hidden"
-        style={{backgroundColor: '#f8f5ee', height: 300 }}
+        style={{ backgroundColor: '#f8f5ee', height: 300 }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
@@ -169,7 +182,7 @@ export default function Dashboard() {
 
       <div
         className="p-4 border rounded-3xl shadow-lg overflow-hidden flex-grow"
-        style={{backgroundColor: '#f8f5ee',  marginTop: '1.5rem' }}
+        style={{ backgroundColor: '#f8f5ee', marginTop: '1.5rem' }}
       >
         <h4 className="text-lg font-semibold mb-4">Patients</h4>
         <PatientList patients={filteredPatients} />
