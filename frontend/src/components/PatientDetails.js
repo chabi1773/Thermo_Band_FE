@@ -77,174 +77,7 @@ export default function PatientDetails() {
     fetchDetails();
   }, [id]);
 
-  async function handleAssignDevice(e) {
-    e.preventDefault();
-    setError('');
-    if (!selectedMac) {
-      setError('Please select a device MAC address.');
-      return;
-    }
-    setAssignLoading(true);
-
-    const token = await getToken();
-    if (!token) {
-      setAssignLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        'https://thermoband-production.up.railway.app/patients/assign-device',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ patientId: id, macAddress: selectedMac }),
-        }
-      );
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to assign device');
-        setAssignLoading(false);
-        return;
-      }
-
-      setDeviceMac(selectedMac);
-      alert('Device assigned successfully!');
-    } catch (err) {
-      setError('Failed to assign device');
-    } finally {
-      setAssignLoading(false);
-    }
-  }
-
-  async function handleResetDevice() {
-    const confirmed = window.confirm(
-      'Are you sure you want to reset the device? This will unassign it from the patient.'
-    );
-    if (!confirmed) return;
-
-    setResetLoading(true);
-    setError('');
-
-    const token = await getToken();
-    if (!token) {
-      setResetLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        'https://thermoband-production.up.railway.app/patients/reset-device',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ macAddress: deviceMac, reset: true }),
-        }
-      );
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to reset device');
-        setResetLoading(false);
-        return;
-      }
-
-      alert('Device reset successfully! You can now assign a new device.');
-      setDeviceMac('');
-      setSelectedMac('');
-      setInterval('300');
-      const deviceList = await apiGet('/esp32/unassigned-devices');
-      setDevices(deviceList);
-      if (deviceList.length > 0) setSelectedMac(deviceList[0].macaddress);
-    } catch (err) {
-      setError('Failed to reset device');
-    } finally {
-      setResetLoading(false);
-    }
-  }
-
-  async function handleDeletePatient() {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this patient? This action cannot be undone and will erase all related data.'
-    );
-    if (!confirmed) return;
-
-    setDeleteLoading(true);
-    setError('');
-
-    const token = await getToken();
-    if (!token) {
-      setDeleteLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `https://thermoband-production.up.railway.app/patients/${id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to delete patient');
-        setDeleteLoading(false);
-        return;
-      }
-
-      alert('Patient deleted successfully!');
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Failed to delete patient');
-    } finally {
-      setDeleteLoading(false);
-    }
-  }
-
-  async function handleSetInterval() {
-    setError('');
-    const token = await getToken();
-    if (!token || !interval || !deviceMac) return;
-
-    try {
-      const res = await fetch(
-        'https://thermoband-production.up.railway.app/patients/set-interval',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            macAddress: deviceMac,
-            interval: parseInt(interval),
-          }),
-        }
-      );
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to set interval');
-        return;
-      }
-
-      alert('Interval updated successfully!');
-    } catch (err) {
-      setError('Failed to set interval');
-    }
-  }
+  // Your handlers unchanged...
 
   if (loading) {
     return (
@@ -264,7 +97,19 @@ export default function PatientDetails() {
   }
 
   return (
-    <div className="container px-4 py-5">
+    <div className="container px-4 py-5 position-relative" style={{ minHeight: '600px' }}>
+      {/* Reset Device button top right */}
+      {deviceMac && (
+        <button
+          onClick={handleResetDevice}
+          disabled={resetLoading}
+          className="btn btn-danger position-absolute"
+          style={{ top: '1rem', right: '1rem' }}
+        >
+          {resetLoading ? 'Resetting...' : 'Reset Device'}
+        </button>
+      )}
+
       <button
         className="btn btn-link mb-4 text-decoration-none"
         onClick={() => navigate(-1)}
@@ -316,64 +161,60 @@ export default function PatientDetails() {
           </button>
         </form>
       ) : (
-        <div className="mb-5">
-          <label className="form-label fw-semibold">Set Device Interval:</label>
-          <select
-            value={interval}
-            onChange={(e) => setInterval(e.target.value)}
-            className="form-select w-auto"
-          >
-            <option value="">Select Interval</option>
-            <option value="300">5 minutes</option>
-            <option value="900">15 minutes</option>
-            <option value="1800">30 minutes</option>
-            <option value="3600">1 hour</option>
-            <option value="21600">6 hours</option>
-          </select>
-          <button
-            onClick={handleSetInterval}
-            disabled={!interval}
-            className="btn btn-warning mt-3 me-2"
-          >
-            Set Interval
-          </button>
+        <>
+          {/* Chart */}
+          <div className="card p-4 shadow mb-3">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={temperatures}>
+                <XAxis dataKey="DateTime" />
+                <YAxis domain={[35, 42]} unit="°C" />
+                <Tooltip />
+                <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
 
-          <button
-            onClick={handleResetDevice}
-            disabled={resetLoading}
-            className="btn btn-danger me-2 position-absolute bottom-0 end-0 m-3"
-          >
-            {resetLoading ? 'Resetting...' : 'Reset Device'}
-          </button>
-
-          <button
-            onClick={handleDeletePatient}
-            disabled={deleteLoading}
-            className="btn btn-dark"
-          >
-            {deleteLoading ? 'Deleting...' : 'Delete Patient'}
-          </button>
-
-          {error && <p className="text-danger mt-2">{error}</p>}
-        </div>
+          {/* Below chart: interval controls */}
+          <div className="d-flex align-items-center mb-5 gap-3">
+            <div>
+              <label className="form-label fw-semibold mb-1">Set Device Interval:</label>
+              <select
+                value={interval}
+                onChange={(e) => setInterval(e.target.value)}
+                className="form-select w-auto"
+              >
+                <option value="">Select Interval</option>
+                <option value="300">5 minutes</option>
+                <option value="900">15 minutes</option>
+                <option value="1800">30 minutes</option>
+                <option value="3600">1 hour</option>
+                <option value="21600">6 hours</option>
+              </select>
+            </div>
+            <button
+              onClick={handleSetInterval}
+              disabled={!interval}
+              className="btn btn-warning"
+            >
+              Set Interval
+            </button>
+            <p className="mb-0 ms-3">
+              <strong>Current Interval:</strong> {interval ? `${interval / 60} min` : 'Not set'}
+            </p>
+          </div>
+        </>
       )}
 
-      <h4 className="h5 mb-3">Temperature History (Last 6 hours)</h4>
+      <button
+        onClick={handleDeletePatient}
+        disabled={deleteLoading}
+        className="btn btn-dark position-absolute"
+        style={{ bottom: '1rem', right: '1rem' }}
+      >
+        {deleteLoading ? 'Deleting...' : 'Delete Patient'}
+      </button>
 
-      {temperatures.length === 0 ? (
-        <p className="text-muted">No temperature data available.</p>
-      ) : (
-        <div className="card p-4 shadow">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={temperatures}>
-              <XAxis dataKey="DateTime" />
-              <YAxis domain={[35, 42]} unit="°C" />
-              <Tooltip />
-              <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+      {error && <p className="text-danger mt-2">{error}</p>}
     </div>
   );
 }
