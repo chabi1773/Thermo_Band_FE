@@ -146,7 +146,7 @@ export default function Dashboard() {
 
       <div className="flex justify-end mb-4">
         <button
-          <button class="bg-sky-500 hover:bg-sky-700 ">
+           class="bg-sky-500 hover:bg-sky-700 "
           onClick={() => navigate('/add-patient')}
         >
           Add Patient
