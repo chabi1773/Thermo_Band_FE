@@ -329,7 +329,7 @@ export default function PatientDetails() {
             disabled={assignLoading || devices.length === 0}
             className="btn btn-primary mt-3"
           >
-            {renderButtonContent(assignLoading, 'Assigning...')}
+            {renderButtonContent(assignLoading, 'Assign Device')}
           </button>
         </form>
       ) : (
@@ -385,7 +385,7 @@ export default function PatientDetails() {
             className="btn btn-danger position-absolute top-0 end-0 m-3"
             style={{ zIndex: 10 }}
           >
-            {renderButtonContent(resetLoading, 'Reset.')}
+            {renderButtonContent(resetLoading, 'Reset Device')}
           </button>
 
           <button
@@ -393,7 +393,7 @@ export default function PatientDetails() {
             disabled={deleteLoading}
             className="btn btn-dark position-absolute bottom-0 end-0 m-3"
           >
-            {renderButtonContent(deleteLoading, 'Delete.')}
+            {renderButtonContent(deleteLoading, 'Delete Patient')}
           </button>
 
           {error && <p className="text-danger mt-2">{error}</p>}
