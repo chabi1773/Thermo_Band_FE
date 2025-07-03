@@ -38,7 +38,7 @@ export default function PatientDetails() {
         const patientData = await apiGet(`/patients/${id}`);
         setPatient(patientData);
 
-        // ✅ Always fetch temperature data
+        // Fetch temperature data always
         try {
           const tempData = await apiGet(`/temperatures/${id}`);
           const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
@@ -55,7 +55,6 @@ export default function PatientDetails() {
           console.error("Failed to fetch temperatures", err);
         }
 
-        // ✅ Device data (might be none)
         const deviceData = await apiGet(`/devicepatient/${id}`);
         const currentMac = deviceData.macaddress || '';
         setDeviceMac(currentMac);
@@ -64,7 +63,6 @@ export default function PatientDetails() {
           setInterval(deviceData.interval.toString());
         }
 
-        // If no device, show unassigned list
         if (!currentMac) {
           const unassignedDevices = await apiGet('/esp32/unassigned-devices');
           setDevices(unassignedDevices);
@@ -167,7 +165,10 @@ export default function PatientDetails() {
         return;
       }
 
+      // ✅ Success message (do not navigate)
       showSuccess('Device will reset on next temperature record. If you want to reset immediately, please restart your Thermoband.');
+
+      // ✅ Show assign device form again
       setDeviceMac('');
       setSelectedMac('');
       setInterval('300');
