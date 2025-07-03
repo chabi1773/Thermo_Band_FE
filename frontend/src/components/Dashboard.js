@@ -10,7 +10,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Toast, ToastContainer } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
+import QRCode from 'qrcode.react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,8 +20,9 @@ export default function Dashboard() {
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [filter, setFilter] = useState('all');
-  const [showToast, setShowToast] = useState(false);
+  const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [hospitalID, setHospitalID] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -75,10 +77,22 @@ export default function Dashboard() {
 
     if (session?.user?.id) {
       setHospitalID(session.user.id);
-      setShowToast(true);
+      setShowDeviceModal(true);
+      setCopied(false);
     } else {
       console.error('No session or user ID found');
     }
+  };
+
+  const jsonData = {
+    hospitalID,
+    // Add more device configuration fields here in future
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const latestTempsByPatient = {};
@@ -148,38 +162,17 @@ export default function Dashboard() {
   };
 
   return (
-    <div
-      className="container-fluid d-flex flex-column"
-      style={{ height: '100vh', padding: '1.5rem' }}
-    >
+    <div className="container-fluid d-flex flex-column" style={{ height: '100vh', padding: '1.5rem' }}>
       <h2 className="text-center mb-4 title">Patient Temperature Dashboard</h2>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div
-          className="mb-4"
-          style={{
-            width: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-          }}
-        >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="mb-4" style={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label htmlFor="filter" className="form-label fw-semibold">
             Filter by Temperature Range:
           </label>
           <select
             id="filter"
-            style={{
-              width: '40%',
-              borderRadius: '4px',
-              padding: '10px 16px',
-            }}
+            style={{ width: '40%', borderRadius: '4px', padding: '10px 16px' }}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="form-select"
@@ -190,65 +183,66 @@ export default function Dashboard() {
             <option value="high">High (39°C and above)</option>
           </select>
         </div>
-        <div
-          className="mb-4"
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '10px',
-          }}
-        >
+        <div className="mb-4" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button
             className="btn btn-primary"
             onClick={() => navigate('/add-patient')}
-            style={{
-              borderRadius: '4px',
-              padding: '10px 16px',
-            }}
+            style={{ borderRadius: '4px', padding: '10px 16px' }}
           >
             Add Patient
           </button>
-        
           <button
             className="btn btn-secondary"
             onClick={handleAddDevice}
-            style={{
-              borderRadius: '4px',
-              padding: '10px 16px',
-            }}
+            style={{ borderRadius: '4px', padding: '10px 16px' }}
           >
             Add Device
           </button>
         </div>
-
       </div>
 
-      {/* Toast for hospitalID */}
-      <ToastContainer position="top-end" className="p-3">
-        <Toast
-          onClose={() => setShowToast(false)}
-          show={showToast}
-          delay={8000}
-          autohide
-          bg="light"
-        >
-          <Toast.Header closeButton>
-            <strong className="me-auto">Device Setup Info</strong>
-          </Toast.Header>
-          <Toast.Body>
-            <p><strong>Instructions:</strong></p>
-            <ul>
-            {/*Methanata Instructions dpan*/}
-              <li>Use the Hospital ID below to register your device.</li>
-            </ul>
-            <code>{`"hospitalID": "${hospitalID}"`}</code>
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
+      {/* Modal for Device QR + JSON */}
+      <Modal show={showDeviceModal} onHide={() => setShowDeviceModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Device Setup Info</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p><strong>Instructions:</strong></p>
+          <ul>
+            <li>Use the following configuration to register your device.</li>
+            <li>This ID is unique to your Supabase account.</li>
+            <li>QR code can be scanned by a compatible IoT device or mobile setup app.</li>
+          </ul>
+          <div className="text-center mb-3">
+            <QRCode value={JSON.stringify(jsonData)} size={180} />
+          </div>
+          <pre
+            style={{
+              backgroundColor: '#f5f5f5',
+              padding: '10px',
+              borderRadius: '6px',
+              border: '1px solid #ddd',
+              overflowX: 'auto',
+              fontSize: '0.9rem'
+            }}
+          >
+            {JSON.stringify(jsonData, null, 2)}
+          </pre>
+          <div className="text-end">
+            <Button variant="outline-primary" onClick={handleCopy}>
+              {copied ? 'Copied!' : 'Copy JSON'}
+            </Button>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeviceModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Temperature Chart */}
-      <div
-        className="p-3 rounded mb-5 overflow-hidden shadow-sm"
+      <div className="p-3 rounded mb-5 overflow-hidden shadow-sm"
         style={{
           padding: '4dvh 6dvw',
           minHeight: '280px',
@@ -261,25 +255,16 @@ export default function Dashboard() {
       >
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
-            <XAxis
-              dataKey="DateTime"
-              label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }}
-            />
+            <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-            <Scatter
-              data={chartData}
-              dataKey="temperature"
-              fill="#011f4d"
-              shape="circle"
-            />
+            <Scatter data={chartData} dataKey="temperature" fill="#011f4d" shape="circle" />
           </ScatterChart>
         </ResponsiveContainer>
       </div>
 
       {/* Patient List */}
-      <div
-        className="p-3 rounded flex-grow-1 overflow-auto patientList shadow-sm"
+      <div className="p-3 rounded flex-grow-1 overflow-auto patientList shadow-sm"
         style={{
           marginTop: '-1.5rem',
           border: '1px rgba(115, 115, 115, 0.5) solid',
