@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { Toast, ToastContainer } from 'react-bootstrap';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [showToast, setShowToast] = useState(false);
+  const [hospitalID, setHospitalID] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -64,6 +67,19 @@ export default function Dashboard() {
       console.error('Fetch error:', err);
     }
   }
+
+  const handleAddDevice = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session?.user?.id) {
+      setHospitalID(session.user.id);
+      setShowToast(true);
+    } else {
+      console.error('No session or user ID found');
+    }
+  };
 
   const latestTempsByPatient = {};
   temperatureData.forEach((t) => {
@@ -136,29 +152,32 @@ export default function Dashboard() {
       className="container-fluid d-flex flex-column"
       style={{ height: '100vh', padding: '1.5rem' }}
     >
-      <h2 className="text-center mb-4 title">
-        Patient Temperature Dashboard
-      </h2>
+      <h2 className="text-center mb-4 title">Patient Temperature Dashboard</h2>
 
-      <div style = {{
-        display :'flex',
-        justifyContent : 'space-between',
-        alignItems: 'center',
-      }}>
-        <div className="mb-4" style={{ 
-          width: '50%',
+      <div
+        style={{
           display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          gap : '10px',
-         }}>
+        }}
+      >
+        <div
+          className="mb-4"
+          style={{
+            width: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
           <label htmlFor="filter" className="form-label fw-semibold">
             Filter by Temperature Range:
           </label>
           <select
             id="filter"
-            style = {{
+            style={{
               width: '40%',
-              borderRadius : '4px',
+              borderRadius: '4px',
               padding: '10px 16px',
             }}
             value={filter}
@@ -171,20 +190,63 @@ export default function Dashboard() {
             <option value="high">High (39°C and above)</option>
           </select>
         </div>
-        <div className="mb-4">
+        <div
+          className="mb-4"
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '10px',
+          }}
+        >
           <button
-            className="btn btn-primary "
+            className="btn btn-primary"
             onClick={() => navigate('/add-patient')}
-            style = {{
+            style={{
               borderRadius: '4px',
               padding: '10px 16px',
             }}
           >
             Add Patient
           </button>
+        
+          <button
+            className="btn btn-secondary"
+            onClick={handleAddDevice}
+            style={{
+              borderRadius: '4px',
+              padding: '10px 16px',
+            }}
+          >
+            Add Device
+          </button>
         </div>
+
       </div>
 
+      {/* Toast for hospitalID */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={8000}
+          autohide
+          bg="light"
+        >
+          <Toast.Header closeButton>
+            <strong className="me-auto">Device Setup Info</strong>
+          </Toast.Header>
+          <Toast.Body>
+            <p><strong>Instructions:</strong></p>
+            <ul>
+              //Methanata Instructions dpan
+              <li>Use the Hospital ID below to register your device.</li>
+            </ul>
+            <code>{`"hospitalID": "${hospitalID}"`}</code>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+
+      {/* Temperature Chart */}
       <div
         className="p-3 rounded mb-5 overflow-hidden shadow-sm"
         style={{
@@ -195,10 +257,9 @@ export default function Dashboard() {
           alignItems: 'center',
           border: '1px rgba(115, 115, 115, 0.5) solid',
           backgroundColor: '#f1f1f4',
-
-         }}
+        }}
       >
-        <ResponsiveContainer width="100%" height="100%" color = "black">
+        <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
             <XAxis
               dataKey="DateTime"
@@ -219,10 +280,10 @@ export default function Dashboard() {
       {/* Patient List */}
       <div
         className="p-3 rounded flex-grow-1 overflow-auto patientList shadow-sm"
-        style={{ marginTop: '-1.5rem',
+        style={{
+          marginTop: '-1.5rem',
           border: '1px rgba(115, 115, 115, 0.5) solid',
-          
-         }}
+        }}
       >
         <h4 className="mb-3 fw-semibold">Patients</h4>
         <PatientList patients={filteredPatients} />
