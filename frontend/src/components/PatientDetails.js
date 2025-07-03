@@ -38,22 +38,17 @@ export default function PatientDetails() {
         const patientData = await apiGet(`/patients/${id}`);
         setPatient(patientData);
 
-        // Fetch temperature data always
-        try {
-          const tempData = await apiGet(`/temperatures/${id}`);
-          const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+        const tempData = await apiGet(`/temperatures/${id}`);
+        const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
-          const filteredTemps = tempData
-            .filter((t) => new Date(t.datetime) > sixHoursAgo)
-            .map((t) => ({
-              Temperature: t.temperature,
-              DateTime: new Date(t.datetime).toLocaleTimeString(),
-            }));
+        const filteredTemps = tempData
+          .filter((t) => new Date(t.datetime) > sixHoursAgo)
+          .map((t) => ({
+            Temperature: t.temperature,
+            DateTime: new Date(t.datetime).toLocaleTimeString(),
+          }));
 
-          setTemperatures(filteredTemps);
-        } catch (err) {
-          console.error("Failed to fetch temperatures", err);
-        }
+        setTemperatures(filteredTemps);
 
         const deviceData = await apiGet(`/devicepatient/${id}`);
         const currentMac = deviceData.macaddress || '';
@@ -166,10 +161,12 @@ export default function PatientDetails() {
       }
 
       showSuccess('Device will reset on next temperature record. If you want to reset immediately, please restart your Thermoband.');
-
-      // ❌ Don't fetch or auto-select unassigned devices
       setDeviceMac('');
-      setInterval('');
+      setSelectedMac('');
+      setInterval('300');
+      const deviceList = await apiGet('/esp32/unassigned-devices');
+      setDevices(deviceList);
+      if (deviceList.length > 0) setSelectedMac(deviceList[0].macaddress);
     } catch (err) {
       showError('Failed to reset device');
     } finally {
@@ -296,16 +293,28 @@ export default function PatientDetails() {
           {patient.name} <span className="text-muted">(Age: {patient.age})</span>
         </h2>
         <div className="d-flex gap-4 flex-wrap justify-content-center">
-          <span>
-            <strong>MAC Address:</strong> {deviceMac || 'No device linked'}
-          </span>
-          {deviceMac && (
-            <span>
-              <strong>Interval:</strong> {interval ? `${interval / 60} min` : 'Not set'}
-            </span>
-          )}
+          <span><strong>MAC Address:</strong> {deviceMac || 'No device linked'}</span>
+          {deviceMac && <span><strong>Interval:</strong> {interval ? `${interval / 60} min` : 'Not set'}</span>}
         </div>
       </div>
+
+      {temperatures.length > 0 ? (
+        <>
+          <h4 className="h5 mb-2">Temperature History (Last 6 hours)</h4>
+          <div className="card p-3 shadow mb-3 rounded-4">
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={temperatures}>
+                <XAxis dataKey="DateTime" />
+                <YAxis domain={[35, 42]} unit="°C" />
+                <Tooltip />
+                <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      ) : (
+        <p className="text-muted mb-3">No temperature data available.</p>
+      )}
 
       {!deviceMac ? (
         <form onSubmit={handleAssignDevice} className="mb-4">
@@ -331,22 +340,6 @@ export default function PatientDetails() {
         </form>
       ) : (
         <>
-          <h4 className="h5 mb-2">Temperature History (Last 6 hours)</h4>
-          {temperatures.length === 0 ? (
-            <p className="text-muted mb-3">No temperature data available.</p>
-          ) : (
-            <div className="card p-3 shadow mb-3 rounded-4">
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={temperatures}>
-                  <XAxis dataKey="DateTime" />
-                  <YAxis domain={[35, 42]} unit="°C" />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-
           <div className="mb-4">
             <label className="form-label fw-semibold">Set Device Interval:</label>
             <select value={interval} onChange={(e) => setInterval(e.target.value)} className="form-select w-auto">
