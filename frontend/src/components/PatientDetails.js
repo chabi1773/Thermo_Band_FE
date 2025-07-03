@@ -38,18 +38,24 @@ export default function PatientDetails() {
         const patientData = await apiGet(`/patients/${id}`);
         setPatient(patientData);
 
-        const tempData = await apiGet(`/temperatures/${id}`);
-        const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+        // ✅ Always fetch temperature data
+        try {
+          const tempData = await apiGet(`/temperatures/${id}`);
+          const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
-        const filteredTemps = tempData
-          .filter((t) => new Date(t.datetime) > sixHoursAgo)
-          .map((t) => ({
-            Temperature: t.temperature,
-            DateTime: new Date(t.datetime).toLocaleTimeString(),
-          }));
+          const filteredTemps = tempData
+            .filter((t) => new Date(t.datetime) > sixHoursAgo)
+            .map((t) => ({
+              Temperature: t.temperature,
+              DateTime: new Date(t.datetime).toLocaleTimeString(),
+            }));
 
-        setTemperatures(filteredTemps);
+          setTemperatures(filteredTemps);
+        } catch (err) {
+          console.error("Failed to fetch temperatures", err);
+        }
 
+        // ✅ Device data (might be none)
         const deviceData = await apiGet(`/devicepatient/${id}`);
         const currentMac = deviceData.macaddress || '';
         setDeviceMac(currentMac);
@@ -58,6 +64,7 @@ export default function PatientDetails() {
           setInterval(deviceData.interval.toString());
         }
 
+        // If no device, show unassigned list
         if (!currentMac) {
           const unassignedDevices = await apiGet('/esp32/unassigned-devices');
           setDevices(unassignedDevices);
@@ -160,7 +167,7 @@ export default function PatientDetails() {
         return;
       }
 
-      showSuccess('Device reset successfully! You can now assign a new device.');
+      showSuccess('Device will reset on next temperature record. If you want to reset immediately, please restart your Thermoband.');
       setDeviceMac('');
       setSelectedMac('');
       setInterval('300');
@@ -271,35 +278,23 @@ export default function PatientDetails() {
 
   return (
     <div className="container px-4 py-3 position-relative" style={{ minHeight: '650px' }}>
-      {/* Alerts */}
       {error && (
-        <div
-          className="alert alert-danger alert-dismissible fade show rounded-4 shadow bg-opacity-75 backdrop-blur position-absolute top-0 start-50 translate-middle-x mt-3"
-          role="alert"
-        >
+        <div className="alert alert-danger alert-dismissible fade show rounded-4 shadow position-absolute top-0 start-50 translate-middle-x mt-3">
           {error}
           <button type="button" className="btn-close" onClick={() => setError('')} />
         </div>
       )}
       {successMessage && (
-        <div
-          className="alert alert-success alert-dismissible fade show rounded-4 shadow bg-opacity-75 backdrop-blur position-absolute top-0 start-50 translate-middle-x mt-3"
-          role="alert"
-        >
+        <div className="alert alert-success alert-dismissible fade show rounded-4 shadow position-absolute top-0 start-50 translate-middle-x mt-3">
           {successMessage}
           <button type="button" className="btn-close" onClick={() => setSuccessMessage('')} />
         </div>
       )}
 
-      {/* Back button */}
-      <button
-        className="btn btn-secondary position-absolute top-0 start-0 m-3 rounded-pill"
-        onClick={() => navigate(-1)}
-      >
+      <button className="btn btn-secondary position-absolute top-0 start-0 m-3 rounded-pill" onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      {/* Centered patient details */}
       <div className="d-flex flex-column align-items-center mb-4">
         <h2 className="h4 mb-1 text-center">
           {patient.name} <span className="text-muted">(Age: {patient.age})</span>
