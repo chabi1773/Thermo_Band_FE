@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Modal, Button } from 'react-bootstrap';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';  // <-- Correct named import
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -214,7 +214,7 @@ export default function Dashboard() {
             <li>QR code can be scanned by a compatible IoT device or mobile setup app.</li>
           </ul>
           <div className="text-center mb-3">
-            <QRCode value={JSON.stringify(jsonData)} size={180} />
+            <QRCodeCanvas value={JSON.stringify(jsonData)} size={180} />
           </div>
           <pre
             style={{
