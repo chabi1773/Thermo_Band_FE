@@ -6,9 +6,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  body {
-  background-color: #c2cbb3; /* or any color you like */
-}
 }
 
 code {

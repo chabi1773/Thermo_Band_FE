@@ -147,78 +147,82 @@ export default function AddPatient() {
   }
 
   return (
-    <div className="card mx-auto p-4 mt-5 shadow" style={{ maxWidth: '500px' }}>
-      {step === 1 && (
-        <>
-          <h2 className="h5 mb-4">Add New Patient</h2>
-          <form onSubmit={handleAddPatient}>
-            <div className="mb-3">
-              <label className="form-label">Name:</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="form-control"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Age:</label>
-              <input
-                type="number"
-                min="0"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                className="form-control"
-              />
-            </div>
-            {error && <p className="text-danger mb-3">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary"
-            >
-              {loading ? 'Adding...' : 'Add Patient'}
-            </button>
-          </form>
-        </>
-      )}
+    <div className = "container1">
+      <div className="card mx-autos shadow" style={{ width: '30dvw',
+        padding: '5dvh 2dvw',
+       }}>
+        {step === 1 && (
+          <>
+            <center><h2 className="h5 a-pt mb-4">Add New Patient</h2></center>
+            <form onSubmit={handleAddPatient}>
+              <div className="mb-3">
+                <label className="form-label">Name:</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="form-control"
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Age:</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="form-control"
+                />
+              </div>
+              {error && <p className="text-danger mb-3">{error}</p>}
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary btn1"
+              >
+                {loading ? 'Adding...' : 'Add Patient'}
+              </button>
+            </form>
+          </>
+        )}
 
-      {step === 2 && (
-        <>
-          <h2 className="h5 mb-4">Assign Device to Patient</h2>
-          <p className="mb-3">
-            Patient ID: <code>{patientId}</code>
-          </p>
-          <form onSubmit={handleAssignDevice}>
-            <div className="mb-3">
-              <label className="form-label">Device MAC Address:</label>
-              {devices.length === 0 ? (
-                <p className="text-muted mt-1">No unassigned devices available</p>
-              ) : (
-                <select
-                  value={macAddress}
-                  onChange={(e) => setMacAddress(e.target.value)}
-                  className="form-select"
-                >
-                  {devices.map((device) => (
-                    <option key={device.macaddress} value={device.macaddress}>
-                      {device.macaddress}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-            {error && <p className="text-danger mb-3">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading || devices.length === 0}
-              className="btn btn-primary"
-            >
-              {loading ? 'Assigning...' : 'Assign Device'}
-            </button>
-          </form>
-        </>
-      )}
+        {step === 2 && (
+          <>
+            <h2 className="h5 mb-4">Assign Device to Patient</h2>
+            <p className="mb-3">
+              Patient ID: <code>{patientId}</code>
+            </p>
+            <form onSubmit={handleAssignDevice}>
+              <div className="mb-3">
+                <label className="form-label">Device MAC Address:</label>
+                {devices.length === 0 ? (
+                  <p className="text-muted mt-1">No unassigned devices available</p>
+                ) : (
+                  <select
+                    value={macAddress}
+                    onChange={(e) => setMacAddress(e.target.value)}
+                    className="form-select"
+                  >
+                    {devices.map((device) => (
+                      <option key={device.macaddress} value={device.macaddress}>
+                        {device.macaddress}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              {error && <p className="text-danger mb-3">{error}</p>}
+              <button
+                type="submit"
+                disabled={loading || devices.length === 0}
+                className="btn btn-primary"
+              >
+                {loading ? 'Assigning...' : 'Assign Device'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
     </div>
   );
 }

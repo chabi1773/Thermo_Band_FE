@@ -14,7 +14,8 @@ export default function PatientList({ patients }) {
       {patients.map((patient) => (
         <li
           key={patient.patientid}
-          className="list-group-item d-flex justify-content-between align-items-center"
+          className="list-group-item d-flex justify-content-between align-items-center patient-card" 
+          
         >
           <div>
             {patient.name} (Age: {patient.age})

@@ -11,7 +11,7 @@ import AddPatient from './components/AddPatient';
 
 function App() {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#c2cbb3' }}>
+    <div style={{ minHeight: '100vh' }}>
       <AuthProvider>
         <Router>
           <Routes>

@@ -293,7 +293,7 @@ export default function PatientDetails() {
 
       {/* Back button */}
       <button
-        className="btn btn-secondary position-absolute top-0 start-0 m-3 rounded-pill"
+        className="pt-dl-btn btn btn-secondary position-absolute top-0 start-0 m-3"
         onClick={() => navigate(-1)}
       >
         ← Back
@@ -333,7 +333,7 @@ export default function PatientDetails() {
           <button
             type="submit"
             disabled={assignLoading || devices.length === 0}
-            className="btn btn-primary mt-3 rounded-pill"
+            className="pt-dl-btn btn btn-primary mt-3"
           >
             {renderButtonContent(assignLoading, 'Assign Device')}
           </button>
@@ -369,7 +369,7 @@ export default function PatientDetails() {
             <button
               onClick={handleSetInterval}
               disabled={!interval || setIntervalLoading}
-              className="btn btn-warning mt-3 me-2 rounded-pill"
+              className="pt-dl-btn btn btn-warning mt-3 me-2"
             >
               {renderButtonContent(setIntervalLoading, 'Set Interval')}
             </button>
@@ -378,7 +378,7 @@ export default function PatientDetails() {
           <button
             onClick={handleResetDevice}
             disabled={resetLoading}
-            className="btn btn-danger position-absolute top-0 end-0 m-3 rounded-pill"
+            className=" pt-dl-btn btn btn-danger position-absolute top-0 end-0 m-3"
             style={{ zIndex: 10 }}
           >
             {renderButtonContent(resetLoading, 'Reset Device')}
@@ -387,7 +387,7 @@ export default function PatientDetails() {
           <button
             onClick={handleDeletePatient}
             disabled={deleteLoading}
-            className="btn btn-dark position-absolute bottom-0 end-0 m-3 rounded-pill"
+            className="pt-dl-btn btn btn-dark position-absolute bottom-0 end-0 m-3"
           >
             {renderButtonContent(deleteLoading, 'Delete Patient')}
           </button>

@@ -52,8 +52,8 @@ export default function Login() {
         <hr className="my-4" />
 
         <div className="text-center">
-          <p className="mb-2">Don't have an account?</p>
-          <Link to="/signup" className="btn btn-outline-primary w-100 py-2 fw-semibold fs-5">
+          <p className="mb-3">Don't have an account?</p>
+          <Link to="/signup" className="signup-btn btn btn-outline-primary w-100 py-2 fw-semibold fs-5">
             Sign Up
           </Link>
         </div>
