@@ -165,16 +165,11 @@ export default function PatientDetails() {
         return;
       }
 
-      // ✅ Success message (do not navigate)
       showSuccess('Device will reset on next temperature record. If you want to reset immediately, please restart your Thermoband.');
 
-      // ✅ Show assign device form again
+      // ❌ Don't fetch or auto-select unassigned devices
       setDeviceMac('');
-      setSelectedMac('');
-      setInterval('300');
-      const deviceList = await apiGet('/esp32/unassigned-devices');
-      setDevices(deviceList);
-      if (deviceList.length > 0) setSelectedMac(deviceList[0].macaddress);
+      setInterval('');
     } catch (err) {
       showError('Failed to reset device');
     } finally {
