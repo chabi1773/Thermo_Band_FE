@@ -238,7 +238,7 @@ export default function Dashboard() {
           <Toast.Body>
             <p><strong>Instructions:</strong></p>
             <ul>
-              //Methanata Instructions dpan
+            {/*Methanata Instructions dpan*/}
               <li>Use the Hospital ID below to register your device.</li>
             </ul>
             <code>{`"hospitalID": "${hospitalID}"`}</code>
