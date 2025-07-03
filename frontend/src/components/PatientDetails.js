@@ -160,7 +160,7 @@ export default function PatientDetails() {
         return;
       }
 
-      showSuccess('Device reset successfully! You can now assign a new device.');
+      showSuccess('Device will reset on next temperature record. If you want to reset immediately, please restart your Thermoband.');
       setDeviceMac('');
       setSelectedMac('');
       setInterval('300');
@@ -271,21 +271,14 @@ export default function PatientDetails() {
 
   return (
     <div className="container px-4 py-3 position-relative" style={{ minHeight: '650px' }}>
-      {/* Alerts */}
       {error && (
-        <div
-          className="alert alert-danger alert-dismissible fade show rounded-4 shadow bg-opacity-75 backdrop-blur position-absolute top-0 start-50 translate-middle-x mt-3"
-          role="alert"
-        >
+        <div className="alert alert-danger alert-dismissible fade show rounded-4 shadow position-absolute top-0 start-50 translate-middle-x mt-3">
           {error}
           <button type="button" className="btn-close" onClick={() => setError('')} />
         </div>
       )}
       {successMessage && (
-        <div
-          className="alert alert-success alert-dismissible fade show rounded-4 shadow bg-opacity-75 backdrop-blur position-absolute top-0 start-50 translate-middle-x mt-3"
-          role="alert"
-        >
+        <div className="alert alert-success alert-dismissible fade show rounded-4 shadow position-absolute top-0 start-50 translate-middle-x mt-3">
           {successMessage}
           <button type="button" className="btn-close" onClick={() => setSuccessMessage('')} />
         </div>
@@ -301,20 +294,33 @@ export default function PatientDetails() {
 
       {/* Centered patient details */}
       <div className="d-flex flex-column align-items-center mb-4 cont" >
+
         <h2 className="h4 mb-1 text-center">
           {patient.name} <span className="text-muted">(Age: {patient.age})</span>
         </h2>
         <div className="d-flex gap-4 flex-wrap justify-content-center">
-          <span>
-            <strong>MAC Address:</strong> {deviceMac || 'No device linked'}
-          </span>
-          {deviceMac && (
-            <span>
-              <strong>Interval:</strong> {interval ? `${interval / 60} min` : 'Not set'}
-            </span>
-          )}
+          <span><strong>MAC Address:</strong> {deviceMac || 'No device linked'}</span>
+          {deviceMac && <span><strong>Interval:</strong> {interval ? `${interval / 60} min` : 'Not set'}</span>}
         </div>
       </div>
+
+      {temperatures.length > 0 ? (
+        <>
+          <h4 className="h5 mb-2">Temperature History (Last 6 hours)</h4>
+          <div className="card p-3 shadow mb-3 rounded-4">
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={temperatures}>
+                <XAxis dataKey="DateTime" />
+                <YAxis domain={[35, 42]} unit="°C" />
+                <Tooltip />
+                <Line type="monotone" dataKey="Temperature" stroke="#16a34a" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      ) : (
+        <p className="text-muted mb-3">No temperature data available.</p>
+      )}
 
       {!deviceMac ? (
         <form onSubmit={handleAssignDevice} className="mb-4">
