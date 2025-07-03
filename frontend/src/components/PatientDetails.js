@@ -293,14 +293,14 @@ export default function PatientDetails() {
 
       {/* Back button */}
       <button
-        className="pt-dl-btn btn btn-secondary position-absolute top-0 start-0 m-3"
+        className="pt-dl-btn btn back-btn btn-secondary position-absolute top-0 start-0 m-3"
         onClick={() => navigate(-1)}
       >
         ← Back
       </button>
 
       {/* Centered patient details */}
-      <div className="d-flex flex-column align-items-center mb-4">
+      <div className="d-flex flex-column align-items-center mb-4 cont" >
         <h2 className="h4 mb-1 text-center">
           {patient.name} <span className="text-muted">(Age: {patient.age})</span>
         </h2>
@@ -319,7 +319,12 @@ export default function PatientDetails() {
       {!deviceMac ? (
         <form onSubmit={handleAssignDevice} className="mb-4">
           <label className="form-label fw-semibold">Assign Device:</label>
-          <select value={selectedMac} onChange={(e) => setSelectedMac(e.target.value)} className="form-select w-auto">
+          <select style = {{
+              width: '40%',
+              borderRadius : '4px',
+              padding: '10px 16px',
+            }} 
+            value={selectedMac} onChange={(e) => setSelectedMac(e.target.value)} className="form-select w-auto">
             {devices.length === 0 ? (
               <option disabled>No unassigned devices available</option>
             ) : (
@@ -356,7 +361,7 @@ export default function PatientDetails() {
             </div>
           )}
 
-          <div className="mb-4">
+          <div className="mb-4 mt-4 mins">
             <label className="form-label fw-semibold">Set Device Interval:</label>
             <select value={interval} onChange={(e) => setInterval(e.target.value)} className="form-select w-auto">
               <option value="">Select Interval</option>
@@ -366,19 +371,19 @@ export default function PatientDetails() {
               <option value="3600">1 hour</option>
               <option value="21600">6 hours</option>
             </select>
-            <button
+            
+          </div>
+          <button
               onClick={handleSetInterval}
               disabled={!interval || setIntervalLoading}
-              className="pt-dl-btn btn btn-warning mt-3 me-2"
+              className="pt-dl-btn btn btn-warning mt-3 me-2 set-btn"
             >
               {renderButtonContent(setIntervalLoading, 'Set Interval')}
             </button>
-          </div>
-
           <button
             onClick={handleResetDevice}
             disabled={resetLoading}
-            className=" pt-dl-btn btn btn-danger position-absolute top-0 end-0 m-3"
+            className=" pt-dl-btn btn reset-btn btn-danger position-absolute top-0 end-0 m-3"
             style={{ zIndex: 10 }}
           >
             {renderButtonContent(resetLoading, 'Reset Device')}
@@ -387,7 +392,7 @@ export default function PatientDetails() {
           <button
             onClick={handleDeletePatient}
             disabled={deleteLoading}
-            className="pt-dl-btn btn btn-dark position-absolute bottom-0 end-0 m-3"
+            className="pt-dl-btn dlt-btn btn btn-dark position-absolute bottom-0 end-0 m-3"
           >
             {renderButtonContent(deleteLoading, 'Delete Patient')}
           </button>
