@@ -35,9 +35,10 @@
 }
 
 html, body {
-  background-color: #f8f5ee;
+  background-color: #F7F7F8;
   height: 100%;
   margin: 0;
+  font-family: "DM Sans";
 }
 
 #root {
@@ -60,4 +61,113 @@ html, body {
 .btns{
   display: flex;
   justify-content: space-between;
+}
+
+.patient-card{
+  background-color: #F7F7F8;
+  border: 1px rgba(0,0,0,0.2) solid;
+}
+.btn-primary{
+  background-color: #011F4D;
+  border: 2px #011F4D solid;
+}
+.btn:hover{
+  background-color: #4c72ab;
+  transition: all 0.3s ease;
+  color: #F6FBFF
+}
+
+.patientList{
+  background-color: #f1f1f4
+
+}
+
+.recharts-cartesian-axis-line{
+  color: black;
+}
+
+.container1{
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.a-pt{
+  font-family: "DM Sans";
+  font-size: 28px;
+}
+
+.btn1{
+  width: 100%;
+  padding: 12px 0;
+}
+
+.pt-dl.btn{
+  padding: 12px 20px;
+  border-radius: 4px;
+}
+
+.signup-btn{
+  color: #011F4D;
+  border: 2px solid #011F4D;
+}
+
+.mins{
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.cont{
+  margin: 4dvh 0;
+}
+
+.dlt-btn{
+  border: 2px solid red;
+  background-color: red;
+  color: white;
+}
+
+.dlt-btn:hover{
+  background-color: transparent;
+  color: red;
+  border: 2px solid red;
+}
+
+.reset-btn{
+  border: 2px solid red;
+  background-color: transparent;
+  color: red;
+}
+
+.reset-btn:hover{
+  background-color: red;
+  color: white;
+  border: 2px solid red;
+}
+
+.set-btn{
+  border: 2px solid yellow;
+  background-color: yellow;
+  color: black;
+}
+
+.set-btn:hover{
+  background-color: transparent;
+  color: black;
+  border: 2px solid black;
+}
+
+.back-btn:hover{
+  border: 2px solid grey;
+  background-color: grey;
+  color: white;
+}
+
+.back-btn{
+  background-color: transparent;
+  color: grey;
+  border: 2px solid grey;
 }

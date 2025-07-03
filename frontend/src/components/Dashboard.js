@@ -117,7 +117,6 @@ export default function Dashboard() {
       return (
         <div
           style={{
-            backgroundColor: 'white',
             border: '1px solid #ccc',
             padding: '8px',
             borderRadius: '8px',
@@ -135,7 +134,7 @@ export default function Dashboard() {
   return (
     <div
       className="container-fluid d-flex flex-column"
-      style={{ backgroundColor: '#ffffff', height: '100vh', padding: '1.5rem' }}
+      style={{ height: '100vh', padding: '1.5rem' }}
     >
       <h2 className="text-center mb-4 title">
         Patient Temperature Dashboard
@@ -187,18 +186,19 @@ export default function Dashboard() {
       </div>
 
       <div
-        className="p-3 rounded mb-5 overflow-hidden"
-        style={{ backgroundColor: '#ffffff',
+        className="p-3 rounded mb-5 overflow-hidden shadow-sm"
+        style={{
           padding: '4dvh 6dvw',
           minHeight: '280px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           border: '1px rgba(115, 115, 115, 0.5) solid',
+          backgroundColor: '#f1f1f4',
 
          }}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" color = "black">
           <ScatterChart>
             <XAxis
               dataKey="DateTime"
@@ -209,7 +209,7 @@ export default function Dashboard() {
             <Scatter
               data={chartData}
               dataKey="temperature"
-              fill="#f2f2f2"
+              fill="#011f4d"
               shape="circle"
             />
           </ScatterChart>
@@ -218,9 +218,10 @@ export default function Dashboard() {
 
       {/* Patient List */}
       <div
-        className="p-3 rounded flex-grow-1 overflow-auto"
-        style={{ backgroundColor: '#ffffff', marginTop: '-1.5rem',
+        className="p-3 rounded flex-grow-1 overflow-auto patientList shadow-sm"
+        style={{ marginTop: '-1.5rem',
           border: '1px rgba(115, 115, 115, 0.5) solid',
+          
          }}
       >
         <h4 className="mb-3 fw-semibold">Patients</h4>
