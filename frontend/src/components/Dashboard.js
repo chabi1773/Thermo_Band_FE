@@ -212,7 +212,6 @@ export default function Dashboard() {
             }}
           >
             Device ID: <strong>{hospitalID}</strong><br />
-            Use this ID during setup on <code>192.168.4.1</code>.
           </p>
         </Modal.Body>
         <Modal.Footer>
