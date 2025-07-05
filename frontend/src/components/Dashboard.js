@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Modal, Button } from 'react-bootstrap';
-import { QRCodeCanvas } from 'qrcode.react';  // <-- Correct named import
+import { QRCodeCanvas } from 'qrcode.react'; // <-- Correct named import
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('all');
   const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [hospitalID, setHospitalID] = useState('');
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -78,21 +77,9 @@ export default function Dashboard() {
     if (session?.user?.id) {
       setHospitalID(session.user.id);
       setShowDeviceModal(true);
-      setCopied(false);
     } else {
       console.error('No session or user ID found');
     }
-  };
-
-  const jsonData = {
-    hospitalID,
-    // Add more device configuration fields here in future
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const latestTempsByPatient = {};
@@ -201,7 +188,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Modal for Device QR + JSON */}
+      {/* Modal for Device QR + instructions */}
       <Modal show={showDeviceModal} onHide={() => setShowDeviceModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Device Setup Info</Modal.Title>
@@ -209,30 +196,24 @@ export default function Dashboard() {
         <Modal.Body>
           <p><strong>Instructions:</strong></p>
           <ul>
-            <li>Use the following configuration to register your device.</li>
-            <li>This ID is unique to your Supabase account.</li>
-            <li>QR code can be scanned by a compatible IoT device or mobile setup app.</li>
+            <li>Scan the QR code below to configure your device.</li>
+            <li>After scanning, it will redirect to <code>http://192.168.4.1</code> for final setup.</li>
           </ul>
           <div className="text-center mb-3">
-            <QRCodeCanvas value={JSON.stringify(jsonData)} size={180} />
+            <QRCodeCanvas value="http://192.168.4.1" size={180} />
           </div>
-          <pre
+          <p
             style={{
               backgroundColor: '#f5f5f5',
               padding: '10px',
               borderRadius: '6px',
               border: '1px solid #ddd',
-              overflowX: 'auto',
-              fontSize: '0.9rem'
+              fontSize: '0.95rem',
             }}
           >
-            {JSON.stringify(jsonData, null, 2)}
-          </pre>
-          <div className="text-end">
-            <Button variant="outline-primary" onClick={handleCopy}>
-              {copied ? 'Copied!' : 'Copy JSON'}
-            </Button>
-          </div>
+            Device ID: <strong>{hospitalID}</strong><br />
+            Use this ID during setup on <code>192.168.4.1</code>.
+          </p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeviceModal(false)}>
