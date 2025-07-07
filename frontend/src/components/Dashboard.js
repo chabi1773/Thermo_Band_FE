@@ -9,6 +9,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
 import { Modal, Button } from 'react-bootstrap';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -261,6 +262,8 @@ export default function Dashboard() {
             />
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
+            <ReferenceLine y={36.1} stroke="yellow" strokeWidth={2} label="36.1°C" />
+            <ReferenceLine y={38} stroke="red" strokeWidth={2} label="38°C" />
             <Scatter data={chartData} dataKey="temperature" fill="#011f4d" shape="circle" />
           </ScatterChart>
         </ResponsiveContainer>
