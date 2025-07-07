@@ -260,10 +260,10 @@ export default function Dashboard() {
               label={{ value: 'Patient', position: 'insideBottomRight', offset: -5 }}
               type="category"
             />
-            <YAxis domain={[35, 42]} unit="°C" />
+            <YAxis domain={[35, 40]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-            <ReferenceLine y={36.1} stroke="yellow" strokeWidth={2} label="36.1°C" />
-            <ReferenceLine y={38} stroke="red" strokeWidth={2} label="38°C" />
+            <ReferenceLine y={36.1} stroke="orange" strokeWidth={2} />
+            <ReferenceLine y={38} stroke="red" strokeWidth={2} />
             <Scatter data={chartData} dataKey="temperature" fill="#011f4d" shape="circle" />
           </ScatterChart>
         </ResponsiveContainer>
