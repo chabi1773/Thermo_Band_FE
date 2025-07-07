@@ -22,7 +22,7 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('all');
   const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [hospitalID, setHospitalID] = useState('');
-  const [loading, setLoading] = useState(true); // <-- Added loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -162,8 +162,6 @@ export default function Dashboard() {
     <div className="container-fluid d-flex flex-column" style={{ height: '100vh', padding: '1.5rem' }}>
       <h2 className="text-center mb-4 title">Patient Temperature Dashboard</h2>
 
-      {/* Rest of your layout... unchanged */}
-
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="mb-4" style={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label htmlFor="filter" className="form-label fw-semibold">
@@ -239,21 +237,28 @@ export default function Dashboard() {
         </Modal.Footer>
       </Modal>
 
-      {/* Chart and Patient List stay as is */}
-      <div className="p-3 rounded mb-5 overflow-hidden shadow-sm"
+      {/* Temperature Chart */}
+      <div
+        className="p-3 rounded mb-5 overflow-hidden shadow-sm"
         style={{
           padding: '4dvh 6dvw',
           minHeight: '280px',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           border: '1px rgba(115, 115, 115, 0.5) solid',
           backgroundColor: '#f1f1f4',
         }}
       >
+        <h5 className="text-center mb-3">Latest Patient Temperatures</h5>
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart>
-            <XAxis dataKey="DateTime" label={{ value: 'Time', position: 'insideBottomRight', offset: -5 }} />
+            <XAxis
+              dataKey="patientName"
+              label={{ value: 'Patient', position: 'insideBottomRight', offset: -5 }}
+              type="category"
+            />
             <YAxis domain={[35, 42]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
             <Scatter data={chartData} dataKey="temperature" fill="#011f4d" shape="circle" />
