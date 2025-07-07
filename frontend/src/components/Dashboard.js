@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Modal, Button } from 'react-bootstrap';
-import { QRCodeCanvas } from 'qrcode.react'; // <-- Correct named import
+import { QRCodeCanvas } from 'qrcode.react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -22,12 +22,14 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('all');
   const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [hospitalID, setHospitalID] = useState('');
+  const [loading, setLoading] = useState(true); // <-- Added loading state
 
   useEffect(() => {
     fetchData();
   }, []);
 
   async function fetchData() {
+    setLoading(true);
     const {
       data: { session },
       error: sessionError,
@@ -35,6 +37,7 @@ export default function Dashboard() {
 
     if (sessionError || !session) {
       console.error('No active session or token:', sessionError);
+      setLoading(false);
       return;
     }
 
@@ -66,6 +69,8 @@ export default function Dashboard() {
       setFilteredPatients(patientData);
     } catch (err) {
       console.error('Fetch error:', err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -105,10 +110,7 @@ export default function Dashboard() {
     const filtered = patients.filter((patient) => {
       const latestTemp = latestTempsByPatient[patient.patientid];
       if (!latestTemp) return false;
-
-      return (
-        latestTemp.temperature >= range[0] && latestTemp.temperature <= range[1]
-      );
+      return latestTemp.temperature >= range[0] && latestTemp.temperature <= range[1];
     });
 
     setFilteredPatients(filtered);
@@ -132,13 +134,7 @@ export default function Dashboard() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div
-          style={{
-            border: '1px solid #ccc',
-            padding: '8px',
-            borderRadius: '8px',
-          }}
-        >
+        <div style={{ border: '1px solid #ccc', padding: '8px', borderRadius: '8px' }}>
           <p style={{ margin: 0, fontWeight: 'bold' }}>{data.patientName}</p>
           <p style={{ margin: 0 }}>Temp: {data.temperature}°C</p>
           <p style={{ margin: 0 }}>Time: {data.DateTime}</p>
@@ -148,9 +144,25 @@ export default function Dashboard() {
     return null;
   };
 
+  const copyHospitalID = () => {
+    navigator.clipboard.writeText(hospitalID)
+      .then(() => alert('Hospital ID copied to clipboard!'))
+      .catch((err) => console.error('Copy failed:', err));
+  };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <h3>Loading dashboard data...</h3>
+      </div>
+    );
+  }
+
   return (
     <div className="container-fluid d-flex flex-column" style={{ height: '100vh', padding: '1.5rem' }}>
       <h2 className="text-center mb-4 title">Patient Temperature Dashboard</h2>
+
+      {/* Rest of your layout... unchanged */}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="mb-4" style={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -197,7 +209,13 @@ export default function Dashboard() {
           <p><strong>Instructions:</strong></p>
           <ul>
             <li>Scan the QR code below to configure your device.</li>
-            <li>After scanning, it will redirect to <code>http://192.168.4.1</code> for final setup.</li>
+            <li>
+              After scanning, it will redirect to{' '}
+              <a href="http://192.168.4.1" target="_blank" rel="noopener noreferrer">
+                http://192.168.4.1
+              </a>{' '}
+              for final setup.
+            </li>
           </ul>
           <div className="text-center mb-3">
             <QRCodeCanvas value="http://192.168.4.1" size={180} />
@@ -211,17 +229,17 @@ export default function Dashboard() {
               fontSize: '0.95rem',
             }}
           >
-            Device ID: <strong>{hospitalID}</strong><br />
+            Device ID: <strong>{hospitalID}</strong>
           </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeviceModal(false)}>
-            Close
+          <Button variant="primary" onClick={copyHospitalID}>
+            Copy Hospital ID
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Temperature Chart */}
+      {/* Chart and Patient List stay as is */}
       <div className="p-3 rounded mb-5 overflow-hidden shadow-sm"
         style={{
           padding: '4dvh 6dvw',
@@ -243,7 +261,6 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Patient List */}
       <div className="p-3 rounded flex-grow-1 overflow-auto patientList shadow-sm"
         style={{
           marginTop: '-1.5rem',
