@@ -262,7 +262,7 @@ export default function Dashboard() {
             />
             <YAxis domain={[35, 40]} unit="°C" />
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-            <ReferenceLine y={36.1} stroke="orange" strokeWidth={2} />
+                {/*<ReferenceLine y={36.1} stroke="orange" strokeWidth={2} /> */}
             <ReferenceLine y={38} stroke="red" strokeWidth={2} />
             <Scatter data={chartData} dataKey="temperature" fill="#011f4d" shape="circle" />
           </ScatterChart>
